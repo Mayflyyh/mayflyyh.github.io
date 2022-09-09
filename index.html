@@ -119,9 +119,14 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">posts</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
@@ -163,6 +168,96 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://mayflyyh.github.io/2022/09/09/CS144-Lab1-byte-stream/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Mayflyyh">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mayflyyh's blog">
+      <meta itemprop="description" content="My blog">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Mayflyyh's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/09/09/CS144-Lab1-byte-stream/" class="post-title-link" itemprop="url">CS144 Lab1 byte stream</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2022-09-09 15:35:56 / Modified: 16:48:15" itemprop="dateCreated datePublished" datetime="2022-09-09T15:35:56+00:00">2022-09-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CS144/" itemprop="url" rel="index"><span itemprop="name">CS144</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="CS144-Lab-Checkpoint-1"><a href="#CS144-Lab-Checkpoint-1" class="headerlink" title="CS144 Lab Checkpoint 1"></a>CS144 Lab Checkpoint 1</h1><h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>Over the next four weeks, you’ll implement TCP, to provide the byte-stream abstraction between a pair of computers separated by an unreliable datagram network. </p>
+<img src="/2022/09/09/CS144-Lab1-byte-stream/1662711801508.png" class="" title="This is an example image">
+
+<p>Figure 1: The arrangement of modules and dataflow in your TCP implementation. The ByteStream was Lab. The job of TCP is to convey two <strong>ByteStreams</strong>* (one in each direction) over an unreliable datagram network, so that bytes written to the socket on one side of the connection emerge as bytes that can be read at the peer, and vice versa. Lab 1 is the <strong>StreamReassembler</strong>*, and in Labs 2, 3, and 4 you’ll implement the <strong>TCPReceiver</strong>, <strong>TCPSender</strong>, and then the <strong>TCPConnection</strong> to tie it all together. </p>
+<hr>
+<p>In Lab 1, you’ll implement a stream reassembler—a module that stitches small pieces of the byte stream (known as substrings, or segments) back into a contiguous stream of bytes in the correct sequence.  </p>
+<h2 id="Getting-started"><a href="#Getting-started" class="headerlink" title="Getting started"></a>Getting started</h2><p>The TCP sender is dividing its byte stream up into short segments (substrings no more than about 1,460 bytes apiece) so that they each fit inside a datagram. But the network might reorder these datagrams, or drop them, or deliver them more than once. The receiver must reassemble the segments into the contiguous stream of bytes that they started out as.  </p>
+<p>熟悉了字符串的使用（）</p>
+<p>挺多细节很有意思，适合出成大模拟题！</p>
+<img src="/2022/09/09/CS144-Lab1-byte-stream/1662741049597.png" class="" title="This is an example image">
+
+<p>第14个点慢应该是网络原因吧（）</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://mayflyyh.github.io/2022/09/09/cs144%20lab0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -181,7 +276,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/09/09/cs144%20lab0/" class="post-title-link" itemprop="url">CS 144 Lab0 warmup</a>
+          <a href="/2022/09/09/cs144%20lab0/" class="post-title-link" itemprop="url">CS144 Lab0 warmup</a>
         </h2>
 
         <div class="post-meta-container">
@@ -193,7 +288,16 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2022-09-09 11:55:19 / Modified: 05:02:35" itemprop="dateCreated datePublished" datetime="2022-09-09T11:55:19+00:00">2022-09-09</time>
+      <time title="Created: 2022-09-09 11:55:19 / Modified: 16:48:15" itemprop="dateCreated datePublished" datetime="2022-09-09T11:55:19+00:00">2022-09-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CS144/" itemprop="url" rel="index"><span itemprop="name">CS144</span></a>
+        </span>
     </span>
 
   
