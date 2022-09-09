@@ -29,8 +29,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-<<<<<<< HEAD
           publish_dir: ./public
-=======
-          publish_dir: ./public
->>>>>>> ff845d9383f78dd74f2df9f7c76e0f54dd26e530
