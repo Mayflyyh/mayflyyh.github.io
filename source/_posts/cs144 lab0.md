@@ -1,9 +1,11 @@
 ---
-title: CS 144 Lab0 warmup
+title: CS144 Lab0 warmup
 date: 2022-09-09 11:55:19
+categories:
+- CS144
 tags: 
 - lab 
-- computer network
+- network
 ---
 
 # CS144: Lab Checkpoint 0: networking warmup
