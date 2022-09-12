@@ -1,8 +1,10 @@
 ---
 title: '6.S081 Lab: Xv6 and Unix utilities'
 date: 2022-09-11 22:21:44
-tags:
+categories:
 - 6.S081
+tags:
+- OS
 - lab
 ---
 
@@ -50,4 +52,4 @@ tags:
 
 利用 `|` 传输的数据直接用read读就好
 
-![1662954828683](/6-S081-Lab-Xv6-and-Unix-utilities/1662954828683.png)
+{% asset_img 1662954828683.png pic %}
