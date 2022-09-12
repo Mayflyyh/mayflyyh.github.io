@@ -6,6 +6,10 @@ tags:
 - lab
 ---
 
+开始做6-S081的实验
+
+ <!-- more --> 
+
 链接：[点击此处](https://pdos.csail.mit.edu/6.828/2020/labs/util.html)
 
 ## Boot xv6
@@ -46,4 +50,4 @@ tags:
 
 利用 `|` 传输的数据直接用read读就好
 
-![1662954828683](/6-S081-Lab-Xv6-and-Unix-utilities.assets/1662954828683.png)
+![1662954828683](/6-S081-Lab-Xv6-and-Unix-utilities/1662954828683.png)

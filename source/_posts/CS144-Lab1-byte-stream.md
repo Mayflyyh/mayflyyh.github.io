@@ -14,6 +14,8 @@ tags:
 
 Over the next four weeks, you’ll implement TCP, to provide the byte-stream abstraction between a pair of computers separated by an unreliable datagram network. 
 
+<!-- more -->
+
 {% asset_img 1662711801508.png This is an example image %}
 
 Figure 1: The arrangement of modules and dataflow in your TCP implementation. The ByteStream was Lab. The job of TCP is to convey two **ByteStreams*** (one in each direction) over an unreliable datagram network, so that bytes written to the socket on one side of the connection emerge as bytes that can be read at the peer, and vice versa. Lab 1 is the **StreamReassembler***, and in Labs 2, 3, and 4 you’ll implement the **TCPReceiver**, **TCPSender**, and then the **TCPConnection** to tie it all together. 

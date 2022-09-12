@@ -24,6 +24,8 @@ Connection: close
 
 Remember to hit the Enter key one more time .This sends an empty line and tells the server that you are done with your HTTP request. 
 
+<!-- more -->
+
 ## Send yourself an email
 
 因为没有斯坦福的邮箱，所以用了QQ邮箱。
