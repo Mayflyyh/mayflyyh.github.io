@@ -204,7 +204,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2022-09-12 04:03:11" itemprop="dateModified" datetime="2022-09-12T04:03:11+00:00">2022-09-12</time>
+      <time title="Modified: 2022-09-12 04:13:59" itemprop="dateModified" datetime="2022-09-12T04:13:59+00:00">2022-09-12</time>
     </span>
 
   
@@ -217,32 +217,15 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>链接：<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/util.html">点击此处</a></p>
-<h2 id="Boot-xv6"><a href="#Boot-xv6" class="headerlink" title="Boot xv6"></a>Boot xv6</h2><p>安装在了wls上</p>
-<blockquote>
-<p>You can run make grade to test your solutions with the grading program.</p>
-</blockquote>
-<h2 id="sleep-easy"><a href="#sleep-easy" class="headerlink" title="sleep  (easy)"></a>sleep  (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">easy</a>)</h2><blockquote>
-<p>Implement the UNIX program <code>sleep</code> for xv6; your <code>sleep</code> should pause for a user-specified number of ticks. A tick is a notion of time defined by the xv6 kernel, namely the time between two interrupts from the timer chip. Your solution should be in the file <code>user/sleep.c</code>.</p>
-</blockquote>
-<p>直接 Use the system call sleep 即可</p>
-<h2 id="pingpong-easy"><a href="#pingpong-easy" class="headerlink" title="pingpong (easy)"></a>pingpong (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">easy</a>)</h2><blockquote>
-<p>Write a program that uses UNIX system calls to ‘’ping-pong’’ a byte between two processes over a pair of pipes, one for each direction. The parent should send a byte to the child; the child should print “<pid>: received ping”, where <pid> is its process ID, write the byte on the pipe to the parent, and exit; the parent should read the byte from the child, print “<pid>: received pong”, and exit. Your solution should be in the file <code>user/pingpong.c</code>.</p>
-</blockquote>
-<p>很简单</p>
-<h2 id="primes-moderate-x2F-hard"><a href="#primes-moderate-x2F-hard" class="headerlink" title="primes (moderate)&#x2F;(hard)"></a>primes (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">moderate</a>)&#x2F;(<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">hard</a>)</h2><blockquote>
-<p>Write a concurrent version of prime sieve using pipes. This idea is due to Doug McIlroy, inventor of Unix pipes. The picture halfway down <a target="_blank" rel="noopener" href="http://swtch.com/~rsc/thread/">this page</a> and the surrounding text explain how to do it. Your solution should be in the file <code>user/primes.c</code>.</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="http://swtch.com/~rsc/thread/">this page</a> 很有意思</p>
-<p> <img src="https://swtch.com/~rsc/thread/sieve.gif" alt="img"> </p>
-<p>利用递归思想和<code>fork()</code>和<code>pipe()</code>进行实现</p>
-<h2 id="find-moderate"><a href="#find-moderate" class="headerlink" title="find (moderate)"></a>find (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">moderate</a>)</h2><blockquote>
-<p>Write a simple version of the UNIX find program: find all the files in a directory tree with a specific name. Your solution should be in the file <code>user/find.c</code>. </p>
-</blockquote>
-<p>魔改 <code>ls.c</code></p>
-<h2 id="xargs-moderate"><a href="#xargs-moderate" class="headerlink" title="xargs (moderate)"></a>xargs (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">moderate</a>)</h2><p>利用 <code>|</code> 传输的数据直接用read读就好</p>
-<p><img src="/6-S081-Lab-Xv6-and-Unix-utilities.assets/1662954828683.png" alt="1662954828683"></p>
-
+          <p>开始做6-S081的实验</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/09/11/6-S081-Lab-Xv6-and-Unix-utilities/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -304,7 +287,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2022-09-12 04:03:11" itemprop="dateModified" datetime="2022-09-12T04:03:11+00:00">2022-09-12</time>
+      <time title="Modified: 2022-09-12 04:13:59" itemprop="dateModified" datetime="2022-09-12T04:13:59+00:00">2022-09-12</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -395,7 +378,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2022-09-12 04:03:11" itemprop="dateModified" datetime="2022-09-12T04:03:11+00:00">2022-09-12</time>
+      <time title="Modified: 2022-09-12 04:13:59" itemprop="dateModified" datetime="2022-09-12T04:13:59+00:00">2022-09-12</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -418,18 +401,14 @@
     
     <div class="post-body" itemprop="articleBody">
           <h1 id="CS144-Lab-Checkpoint-1"><a href="#CS144-Lab-Checkpoint-1" class="headerlink" title="CS144 Lab Checkpoint 1"></a>CS144 Lab Checkpoint 1</h1><h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>Over the next four weeks, you’ll implement TCP, to provide the byte-stream abstraction between a pair of computers separated by an unreliable datagram network. </p>
-<img src="/2022/09/09/CS144-Lab1-byte-stream/1662711801508.png" class="" title="This is an example image">
-
-<p>Figure 1: The arrangement of modules and dataflow in your TCP implementation. The ByteStream was Lab. The job of TCP is to convey two <strong>ByteStreams</strong>* (one in each direction) over an unreliable datagram network, so that bytes written to the socket on one side of the connection emerge as bytes that can be read at the peer, and vice versa. Lab 1 is the <strong>StreamReassembler</strong>*, and in Labs 2, 3, and 4 you’ll implement the <strong>TCPReceiver</strong>, <strong>TCPSender</strong>, and then the <strong>TCPConnection</strong> to tie it all together. </p>
-<hr>
-<p>In Lab 1, you’ll implement a stream reassembler—a module that stitches small pieces of the byte stream (known as substrings, or segments) back into a contiguous stream of bytes in the correct sequence.  </p>
-<h2 id="Getting-started"><a href="#Getting-started" class="headerlink" title="Getting started"></a>Getting started</h2><p>The TCP sender is dividing its byte stream up into short segments (substrings no more than about 1,460 bytes apiece) so that they each fit inside a datagram. But the network might reorder these datagrams, or drop them, or deliver them more than once. The receiver must reassemble the segments into the contiguous stream of bytes that they started out as.  </p>
-<p>熟悉了字符串的使用（）</p>
-<p>挺多细节很有意思，适合出成大模拟题！</p>
-<img src="/2022/09/09/CS144-Lab1-byte-stream/1662741049597.png" class="" title="This is an example image">
-
-<p>第14个点慢应该是网络原因吧（）</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/09/09/CS144-Lab1-byte-stream/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -491,7 +470,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2022-09-12 04:03:11" itemprop="dateModified" datetime="2022-09-12T04:03:11+00:00">2022-09-12</time>
+      <time title="Modified: 2022-09-12 04:13:59" itemprop="dateModified" datetime="2022-09-12T04:13:59+00:00">2022-09-12</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -517,28 +496,14 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">telnet cs144.keithw.org http</span><br><span class="line">GET /hello HTTP/1.1</span><br><span class="line">Host: cs144.keithw.org</span><br><span class="line">Connection: close </span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>Remember to hit the Enter key one more time .This sends an empty line and tells the server that you are done with your HTTP request. </p>
-<h2 id="Send-yourself-an-email"><a href="#Send-yourself-an-email" class="headerlink" title="Send yourself an email"></a>Send yourself an email</h2><p>因为没有斯坦福的邮箱，所以用了QQ邮箱。</p>
-<p>Run: </p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">telnet smtp.qq.com smtp</span><br></pre></td></tr></table></figure>
-
-<p>Type:<code>HELo qq.com</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">250-newxmesmtplogicsvrsza8.qq.com-9.21.160.46-9278235</span><br><span class="line">250-SIZE 73400320</span><br><span class="line">250 OK</span><br></pre></td></tr></table></figure>
-
-<p>Type:<code>auth login</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">334 VXNlcm5hbWU6</span><br></pre></td></tr></table></figure>
-
-<p>VXNlcm5hbWU6 是 Username:  的base64编码</p>
-<p>将邮箱名转换为base64形式后输入，密码（授权码）亦然。</p>
-<p>按照邮件报文格式（RFC:882）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">MAIL FROM:&lt;1273961325@qq.com&gt;</span><br><span class="line">RCPT TO:&lt;yyh073@foxmail.com&gt;</span><br><span class="line">DATA</span><br><span class="line">From: 1273961325@qq.com </span><br><span class="line">To: yyh073@foxmail.com </span><br><span class="line">Subject: Hello from CS144 Lab 0! </span><br><span class="line"></span><br><span class="line">Hello! This is Body.</span><br><span class="line"></span><br><span class="line">.</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="Listening-and-connecting"><a href="#Listening-and-connecting" class="headerlink" title="Listening and connecting"></a>Listening and connecting</h2><p>Run <code>netcat -v -l -p 9090 </code></p>
-<p>Then in another terminal windows, run <code>telnet localhost 9090</code></p>
-<h2 id="Writing-a-network-program-using-an-OS-stream-socket"><a href="#Writing-a-network-program-using-an-OS-stream-socket" class="headerlink" title="Writing a network program using an OS stream socket"></a>Writing a network program using an OS stream socket</h2><h3 id="Writing-webget"><a href="#Writing-webget" class="headerlink" title="Writing webget"></a>Writing webget</h3><p>一定要好好阅读文档</p>
-<h2 id="An-in-memory-reliable-byte-stream"><a href="#An-in-memory-reliable-byte-stream" class="headerlink" title="An in-memory reliable byte stream"></a>An in-memory reliable byte stream</h2><p>利用内存传输流</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/09/09/cs144%20lab0/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
