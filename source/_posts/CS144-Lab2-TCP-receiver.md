@@ -10,9 +10,11 @@ tags:
 
 # CS144 Lab Checkpoint 2
 
-##  Overview 
+##  Overview
 
 In Lab 2, you will implement the TCPReceiver, the part of a TCP implementation that handles the incoming byte stream. The TCPReceiver translates between incoming TCP segments (the payloads of datagrams carried over the Internet) and the incoming byte stream. 
+
+<!-- more -->
 
 In addition to writing to the incoming stream, the TCPReceiver is responsible for telling the sender two things: 
 
