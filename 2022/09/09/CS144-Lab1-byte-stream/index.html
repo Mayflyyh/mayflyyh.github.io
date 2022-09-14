@@ -26,15 +26,15 @@
 <meta property="og:site_name" content="Mayflyyh&#39;s blog">
 <meta property="og:description" content="CS144 Lab Checkpoint 1OverviewOver the next four weeks, you’ll implement TCP, to provide the byte-stream abstraction between a pair of computers separated by an unreliable datagram network.">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://mayflyyh.github.io/2022/09/09/CS144-Lab1-byte-stream/1662711801508.png">
-<meta property="og:image" content="http://mayflyyh.github.io/2022/09/09/CS144-Lab1-byte-stream/1662741049597.png">
+<meta property="og:image" content="http://mayflyyh.github.io/.io//09/09/CS144-Lab1-byte-stream/1662711801508.png">
+<meta property="og:image" content="http://mayflyyh.github.io/.io//09/09/CS144-Lab1-byte-stream/1662741049597.png">
 <meta property="article:published_time" content="2022-09-09T15:35:56.000Z">
-<meta property="article:modified_time" content="2022-09-12T04:17:05.023Z">
+<meta property="article:modified_time" content="2022-09-14T07:01:23.981Z">
 <meta property="article:author" content="Mayflyyh">
 <meta property="article:tag" content="lab">
 <meta property="article:tag" content="network">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://mayflyyh.github.io/2022/09/09/CS144-Lab1-byte-stream/1662711801508.png">
+<meta name="twitter:image" content="http://mayflyyh.github.io/.io//09/09/CS144-Lab1-byte-stream/1662711801508.png">
 
 
 <link rel="canonical" href="http://mayflyyh.github.io/2022/09/09/CS144-Lab1-byte-stream/">
@@ -127,7 +127,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -213,7 +213,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2022-09-12 04:17:05" itemprop="dateModified" datetime="2022-09-12T04:17:05+00:00">2022-09-12</time>
+      <time title="Modified: 2022-09-14 07:01:23" itemprop="dateModified" datetime="2022-09-14T07:01:23+00:00">2022-09-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -238,7 +238,7 @@
         <h1 id="CS144-Lab-Checkpoint-1"><a href="#CS144-Lab-Checkpoint-1" class="headerlink" title="CS144 Lab Checkpoint 1"></a>CS144 Lab Checkpoint 1</h1><h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>Over the next four weeks, you’ll implement TCP, to provide the byte-stream abstraction between a pair of computers separated by an unreliable datagram network. </p>
 <span id="more"></span>
 
-<img src="/2022/09/09/CS144-Lab1-byte-stream/1662711801508.png" class="" title="This is an example image">
+<img src="/.io//09/09/CS144-Lab1-byte-stream/1662711801508.png" class title="This is an example image">
 
 <p>Figure 1: The arrangement of modules and dataflow in your TCP implementation. The ByteStream was Lab. The job of TCP is to convey two <strong>ByteStreams</strong>* (one in each direction) over an unreliable datagram network, so that bytes written to the socket on one side of the connection emerge as bytes that can be read at the peer, and vice versa. Lab 1 is the <strong>StreamReassembler</strong>*, and in Labs 2, 3, and 4 you’ll implement the <strong>TCPReceiver</strong>, <strong>TCPSender</strong>, and then the <strong>TCPConnection</strong> to tie it all together. </p>
 <hr>
@@ -246,7 +246,7 @@
 <h2 id="Getting-started"><a href="#Getting-started" class="headerlink" title="Getting started"></a>Getting started</h2><p>The TCP sender is dividing its byte stream up into short segments (substrings no more than about 1,460 bytes apiece) so that they each fit inside a datagram. But the network might reorder these datagrams, or drop them, or deliver them more than once. The receiver must reassemble the segments into the contiguous stream of bytes that they started out as.  </p>
 <p>熟悉了字符串的使用（）</p>
 <p>挺多细节很有意思，适合出成大模拟题！</p>
-<img src="/2022/09/09/CS144-Lab1-byte-stream/1662741049597.png" class="" title="This is an example image">
+<img src="/.io//09/09/CS144-Lab1-byte-stream/1662741049597.png" class title="This is an example image">
 
 <p>第14个点慢应该是网络原因吧（）</p>
 
