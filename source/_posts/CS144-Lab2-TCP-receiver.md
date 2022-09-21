@@ -8,13 +8,15 @@ tags:
 - network
 ---
 
+实现TCP接收端
+
+<!-- more -->
+
 # CS144 Lab 2: The TCP Receiver
 
 ##  Overview
 
 In Lab 2, you will implement the TCPReceiver, the part of a TCP implementation that handles the incoming byte stream. The TCPReceiver translates between incoming TCP segments (the payloads of datagrams carried over the Internet) and the incoming byte stream. 
-
-<!-- more -->
 
 [Read PDF](https://cs144.github.io/assignments/lab2.pdf)
 

@@ -8,13 +8,15 @@ tags:
 - network
 ---
 
+byte-stream
+
+<!-- more -->
+
 # CS144 Lab Checkpoint 1
 
 ##  Overview
 
 Over the next four weeks, you’ll implement TCP, to provide the byte-stream abstraction between a pair of computers separated by an unreliable datagram network. 
-
-<!-- more -->
 
 ![1662711801508](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1662711801508.png)
 

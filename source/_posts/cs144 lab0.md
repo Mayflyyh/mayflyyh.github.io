@@ -6,7 +6,12 @@ categories:
 tags: 
 - lab 
 - network
+
 ---
+
+热身
+
+<!-- more -->
 
 # CS144: Lab Checkpoint 0: networking warmup
 
@@ -23,8 +28,6 @@ Connection: close
 ```
 
 Remember to hit the Enter key one more time .This sends an empty line and tells the server that you are done with your HTTP request. 
-
-<!-- more -->
 
 ## Send yourself an email
 
