@@ -19,16 +19,16 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"mayflyyh.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="not difficult…">
+    <meta name="description" content="还好">
 <meta property="og:type" content="article">
 <meta property="og:title" content="6.S081 Lab: System call tracing">
 <meta property="og:url" content="http://mayflyyh.github.io/2022/09/13/6-S081-Lab-System-call-tracing/index.html">
 <meta property="og:site_name" content="Mayflyyh&#39;s blog">
-<meta property="og:description" content="not difficult…">
+<meta property="og:description" content="还好">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1663128399812.png">
 <meta property="article:published_time" content="2022-09-13T22:36:36.000Z">
-<meta property="article:modified_time" content="2022-09-21T03:15:59.088Z">
+<meta property="article:modified_time" content="2022-09-21T09:39:18.487Z">
 <meta property="article:author" content="Mayflyyh">
 <meta property="article:tag" content="OS">
 <meta property="article:tag" content="lab">
@@ -137,7 +137,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -212,7 +212,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2022-09-21 03:15:59" itemprop="dateModified" datetime="2022-09-21T03:15:59+00:00">2022-09-21</time>
+      <time title="Modified: 2022-09-21 09:39:18" itemprop="dateModified" datetime="2022-09-21T09:39:18+00:00">2022-09-21</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -234,7 +234,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>not difficult…</p>
+        <p>还好</p>
 <span id="more"></span>
 
 <h2 id="System-call-tracing"><a href="#System-call-tracing" class="headerlink" title="System call tracing"></a>System call tracing</h2><blockquote>
@@ -279,8 +279,35 @@
 
 
 
-<h2 id="Sysinfo"><a href="#Sysinfo" class="headerlink" title="Sysinfo"></a>Sysinfo</h2><p><img src="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1663128399812.png"></p>
-<p>To complete.</p>
+<h2 id="Sysinfo"><a href="#Sysinfo" class="headerlink" title="Sysinfo"></a>Sysinfo</h2><blockquote>
+<ul>
+<li><p>Add <code>$U/_sysinfotest</code> to UPROGS in Makefile</p>
+</li>
+<li><p>Run make qemu; <code>user/sysinfotest.c</code> will fail to compile. Add the system call sysinfo, following the same steps as in the previous assignment. To declare the prototype for sysinfo() <code>in user/user.h</code> you need predeclare the existence of <code>struct sysinfo</code>:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sysinfo</span>;</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sysinfo</span><span class="params">(<span class="keyword">struct</span> sysinfo *)</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>​	   Once you fix the compilation issues, run sysinfotest; it will fail because    you haven’t implemented the system call in the kernel yet.</p>
+</blockquote>
+<p>在<code>user/user.h</code>中添加<code>struct sysinfo</code>和<code>int sysinfo</code>的预定义即可</p>
+<blockquote>
+<ul>
+<li>sysinfo needs to copy a <code>struct sysinfo</code> back to user space; see <code>sys_fstat()</code> (<code>kernel/sysfile.c</code>) and <code>filestat()</code> (<code>kernel/file.c</code>) for examples of how to do that using <code>copyout()</code>.</li>
+</ul>
+</blockquote>
+<p>在kernel&#x2F;sysproc.c中添加<code>sys_sysinfo()</code>函数，在<code>kernel/kalloc.c</code>中实现对未占用内存信息的收集，在<code>kernel/proc.c</code>中实现对进程数信息的收集</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//kernel/sysproc.c</span></span><br><span class="line"></span><br><span class="line">uint64</span><br><span class="line"><span class="title function_">sys_sysinfo</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sysinfo</span> <span class="title">info</span>;</span></span><br><span class="line">    uint64 addr;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">proc</span> *<span class="title">p</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(argaddr(<span class="number">0</span>,&amp;addr)&lt;<span class="number">0</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    p = myproc();</span><br><span class="line">    info.freemem = kfreesize();</span><br><span class="line">    info.nproc = proccount();</span><br><span class="line">    <span class="keyword">if</span>(copyout(p-&gt;pagetable, addr, (<span class="type">char</span> *)&amp;info, <span class="keyword">sizeof</span>(info)) &lt; <span class="number">0</span>)</span><br><span class="line">      <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>copyout就是将kernel space的东西拷贝到user space</p>
+<p>the amount of free memory 在 xv6 中就是查看有多少未被分配的页表</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//kernel/kalloc.c</span></span><br><span class="line"></span><br><span class="line">uint64 </span><br><span class="line"><span class="title function_">kfreesize</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">run</span> *<span class="title">ptr</span> ;</span></span><br><span class="line">    <span class="type">int</span> cnt;</span><br><span class="line"></span><br><span class="line">    cnt = <span class="number">0</span> ;</span><br><span class="line">    ptr = kmem.freelist;</span><br><span class="line">    <span class="keyword">while</span>(ptr)&#123;</span><br><span class="line">        cnt++;</span><br><span class="line">        ptr = ptr-&gt;next;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> cnt * PGSIZE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>the number of processes 即为多少进行部署unused</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//kernel/proc.c</span></span><br><span class="line"><span class="type">int</span></span><br><span class="line"><span class="title function_">proccount</span><span class="params">(<span class="type">void</span>)</span>&#123;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">proc</span> *<span class="title">p</span>;</span></span><br><span class="line">  <span class="type">int</span> cnt = <span class="number">0</span> ;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(p = proc; p &lt; &amp;proc[NPROC]; p++)&#123;</span><br><span class="line">    <span class="keyword">if</span>(p-&gt;state != UNUSED)</span><br><span class="line">      cnt++;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> cnt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<p><img src="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1663128399812.png"></p>
 
     </div>
 
