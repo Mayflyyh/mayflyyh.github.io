@@ -6,7 +6,7 @@ tags:
 
 ---
 
-xv6源码分析
+xv6手册笔记与源码分析
 
 <!-- more -->
 
@@ -14,15 +14,248 @@ xv6源码分析
 
 # Operating system interfaces
 
+TO DO
+
 # Operating system organizaiton
+
+Thus an operating system must fulfill three requirements: multiplexing, isolation, and interaction.
+
+Xv6 runs on a multi-core RISC-V microprocessor, and much of its low-level functionality (for example, its process implementation) is specific to RISC-V. RISC-V is a 64-bit CPU, and xv6 is written in “LP64” C, which means long (L) and pointers (P) in the C programming language are 64 bits, but int is 32-bit.
+
+附 [中文RISC-V手册](http://riscvbook.com/chinese/RISC-V-Reader-Chinese-v2p1.pdf)
+
+## Abstracting physical resources
+
+为什么要有操作系统？操作系统管理下层硬件，并为上层提供服务。
+
+为了实现强隔离，必须禁止应用程序直接访问硬件资源，而是利用操作系统提供的服务。比如UNIX应用程序只能用open，read，write和close与存储系统交互，而不能直接访问磁盘。操作系统提供了一个文件的抽象。
+
+UNIX也通过这种方式提供CPU资源
+
+##  User mode, supervisor mode, and system calls
+
+RISC-V 有三种模式，machine mode, supervisor mode, and user mode
+
+machine mode 有全部的权限，CPU启动时处于machine mode。machine mode主要用于配置计算机。xv6在machine mode下执行几行后就会切换到supervisor mode
+
+In supervisor mode the CPU is allowed to execute privileged instructions:
+
+- enabling and disabling interrupts
+- reading and writing the register that holds the address of a page table
+- ...
+
+CPU不会执行处于user mode的应用程序的privileged instruction。
+
+应用程序如果想要调用内核函数，必须切换到内核态。CPU提供一个特别的指令可以从user mode切换到supervisor mode (RISC-V provides the ecall instruction for this purpose.)
+
+如果切换到了supervisor mode，kernel 会验证参数是否合法。
+
+|File  |Description      |
+| ---- | ---- |
+|bio.c |Disk block cache for the file system.|
+|console.c |Connect to the user keyboard and screen. | 
+|entry.S | Very first boot instructions. |
+|exec.c| exec() system call. |
+|file.c | File descriptor support. |
+|fs.c | File system. |
+|kalloc.c | Physical page allocator. |
+|kernelvec.S | Handle traps from kernel, and timer interrupts. |
+|log.c | File system logging and crash recovery. |
+|main.c | Control initialization of other modules during boot. |
+|pipe.c | Pipes. |
+|plic.c |RISC-V interrupt controller. |
+|printf.c | Formatted output to the console. |
+|proc.c| Processes and scheduling. |
+|sleeplock.c| Locks that yield the CPU. |
+|spinlock.c| Locks that don’t yield the CPU. |
+|start.c| Early machine-mode boot code. |
+|string.c| C string and byte-array library. |
+|swtch.S| Thread switching. |
+|syscall.c| Dispatch(调度) system calls to handling function. |
+|sysfile.c| File-related system calls. |
+|sysproc.c | Process-related system calls. |
+|trampoline.S |Assembly code to switch between user and kernel. |
+|trap.c | C code to handle and return from traps and interrupts. |
+|uart.c | Serial-port console device driver. |
+|virtio_disk.c |Disk device driver. |
+|vm.c| Manage page tables and address spaces.|
+
+From this book’s perspective, microkernel and monolithic operating systems share many key ideas. They implement system calls, they use page tables, they handle interrupts, they support processes, they use locks for concurrency control, they implement a file system, etc. This book focuses on these core ideas.
+Xv6 is implemented as a monolithic kernel, like most Unix operating systems. Thus, the xv6 kernel interface corresponds to the operating system interface, and the kernel implements the complete operating system. Since xv6 doesn’t provide many services, its kernel is smaller than some microkernels, but conceptually xv6 is monolithic.
+
+## Code: xv6 organization
+
+kernel 的 inter-module interfaces 定义在 `/kernel/defs.h`
+
+![image-20220921183738227](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921183738227.png)
+
+## Process overview
+
+Xv6 uses page tables (which are implemented by hardware) to give each process its own address space. The RISC-V page table translates (or “maps”) a virtual address (the address that an RISC-V instruction manipulates) to a physical address (an address that the CPU chip sends to main memory).
+
+xv6为每个进程分别维护页表，定义为user's address space.
+
+user's address space 从虚拟地址的0开始，先是指令和全局变量，后有user stack和heap（用于malloc）。用户如果有需要，可以对heap进行拓展。
+
+RISCV只是用低39位在页表中寻找虚拟地址。xv6只是用39位中的38位。所以最大地址就是0x3fffffffff ，也就是MAXVA (kernel/riscv.h:363)
+
+At the top of the address space xv6 reserves a page for a trampoline and a page mapping the process’s trapframe.
+
+xv6主要用这两个页面切入切出kernel
+
+The trampoline page contains the code to transition in and out of the kernel and mapping the trapframe is necessary to save/restore the state of the user process.
+
+kernel维护了每个进程的状态。在`struct proc`中。
+
+一个进程最重要的kernel state是page table, kernel stack, run state.
+
+kernel可以挂起当前运行的状态，并且恢复另一个线程的状态。
+
+每个进程有user stack和kernel stack，当进程执行用户指令时使用user stack，而kernel stack为空。当进入kernel时（system call or interrupt），kernel在kernel stack上执行代码。显然kernel stack是独立的。
+
+一个进程可以通过调用`ecall`执行 system call。`ecall`可以提升硬件 privilege level 并且将 pc 切换到 a kernel-defined entry point. The code at the entry point switches to a kernel stack and executes the kernel instructions that implement the system call. 当kernel执行结束后，会调用`sret` 切换到 user stack 并且回到 user space 。
+
+进程的线程也会在kernel中阻塞以等待I/O
+
+## Code: starting xv6, the first process and system call
+
+When the RISC-V computer powers on, it initializes itself and runs a boot loader which is stored in read-only memory. The boot loader loads the xv6 kernel into memory. 
+
+Then, in machine mode, the CPU executes xv6 starting at `_entry (kernel/entry.S:7).` The RISC-V starts with paging hardware disabled: virtual addresses map directly to physical addresses.
+
+loader将xv6 kernel载入在物理地址0x80000000. (0x0:0x80000000包含了I/O设备)
+
+```c
+// kernel/entry.S
+
+		# qemu -kernel loads the kernel at 0x80000000
+        # and causes each hart (i.e. CPU) to jump there.
+        # kernel.ld causes the following code to
+        # be placed at 0x80000000.
+.section .text
+.global _entry
+_entry:
+        # set up a stack for C.
+        # stack0 is declared in start.c,
+        # with a 4096-byte stack per CPU.
+        # sp = stack0 + (hartid * 4096)
+        la sp, stack0
+        li a0, 1024*4
+        csrr a1, mhartid
+        addi a1, a1, 1
+        mul a0, a0, a1
+        add sp, sp, a0
+        # jump to start() in start.c
+        call start
+spin:
+        j spin
+```
+
+sp = stack0 + (hartid * 4096)
+
+![image-20220921192342270](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921192342270.png)
+
+![image-20220921192744071](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921192744071.png)
+
+The instructions at _entry set up a stack so that xv6 can run C code. Xv6 declares space for an initial stack, stack0, in the file start.c (kernel/start.c:11). The code at _entry loads the stack pointer register sp with the address stack0+4096, the top of the stack, because the stack on RISC-V grows down. Now that the kernel has a stack, _entry calls into C code at start (kernel/start.c:21).
+
+```c
+// kernel/start.c
+void
+start()
+{
+  // set M Previous Privilege mode to Supervisor, for mret.
+  unsigned long x = r_mstatus();
+  x &= ~MSTATUS_MPP_MASK;
+  x |= MSTATUS_MPP_S;
+  w_mstatus(x);
+
+  // set M Exception Program Counter to main, for mret.
+  // requires gcc -mcmodel=medany
+  w_mepc((uint64)main);
+
+  // disable paging for now.
+  w_satp(0);
+
+  // delegate all interrupts and exceptions to supervisor mode.
+  w_medeleg(0xffff);
+  w_mideleg(0xffff);
+  w_sie(r_sie() | SIE_SEIE | SIE_STIE | SIE_SSIE);
+
+  // configure Physical Memory Protection to give supervisor mode
+  // access to all of physical memory.
+  w_pmpaddr0(0x3fffffffffffffull);
+  w_pmpcfg0(0xf);
+
+  // ask for clock interrupts.
+  timerinit();
+
+  // keep each CPU's hartid in its tp register, for cpuid().
+  int id = r_mhartid();
+  w_tp(id);
+
+  // switch to supervisor mode and jump to main().
+  asm volatile("mret");
+}
+```
+
+The function start performs some configuration that is only allowed in machine mode, and then switches to supervisor mode. To enter supervisor mode, RISC-V provides the instruction `mret`. This instruction is most often used to return from a previous call from supervisor mode to machine mode. start isn’t returning from such a call, and instead sets things up as if there had been one: it sets the previous privilege mode to supervisor in the register mstatus, it sets the return address to main by writing main’s address into the register `mepc`, disables virtual address translation in supervisor mode by writing 0 into the page-table register satp, and delegates all interrupts and exceptions to supervisor mode.
+
+Before jumping into supervisor mode, start performs one more task: it programs the clock chip to generate timer interrupts. With this housekeeping out of the way, start “returns” to supervisor mode by calling mret. This causes the program counter to change to main (kernel/main.c:11).
+
+
+
+After main (kernel/main.c:11) initializes several devices and subsystems, it creates the first process by calling userinit (kernel/proc.c:233). The first process executes a small program written in RISC-V assembly, which makes the first system call in xv6. initcode.S (user/initcode.S:3) loads the number for the exec system call, SYS_EXEC (kernel/syscall.h:8), into register a7, and then calls ecall to re-enter the kernel.
+
+```c
+// Set up first user process.
+void
+userinit(void)
+{
+  struct proc *p;
+
+  p = allocproc();
+  initproc = p;
+  
+  // allocate one user page and copy init's instructions
+  // and data into it.
+  uvminit(p->pagetable, initcode, sizeof(initcode));
+  p->sz = PGSIZE;
+
+  // prepare for the very first "return" from kernel to user.
+  p->trapframe->epc = 0;      // user program counter
+  p->trapframe->sp = PGSIZE;  // user stack pointer
+
+  safestrcpy(p->name, "initcode", sizeof(p->name));
+  p->cwd = namei("/");
+
+  p->state = RUNNABLE;
+
+  release(&p->lock);
+}
+```
+
+The kernel uses the number in register `a7` in `syscall` (kernel/syscall.c:132) to call the desired system call. The system call table (kernel/syscall.c:107) maps `SYS_EXEC` to `sys_exec`, which the kernel invokes. As we saw in Chapter 1, exec replaces the memory and registers of the current process with a new program (in this case, /init). 
+
+Once the kernel has completed `exec`, it returns to user space in the `/init` process. `init (user/init.c:15) `creates a new console device file if needed and then opens it as file descriptors 0, 1, and 2. Then it starts a shell on the console. The system is up.
+
+
+
+##  Security Model
+
+TO DO
 
 # Page Table
 
+TO DO
+
 ## 3.7 Code: sbrk
+
+TO DO
 
 ## 3.8 Code: exec
 
-
+TO DO
 
 # xv6 启动过程
 
