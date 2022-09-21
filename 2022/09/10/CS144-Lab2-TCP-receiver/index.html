@@ -19,19 +19,21 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"mayflyyh.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="CS144 Lab Checkpoint 2OverviewIn Lab 2, you will implement the TCPReceiver, the part of a TCP implementation that handles the incoming byte stream. The TCPReceiver translates between incoming TCP segm">
+    <meta name="description" content="CS144 Lab 2: The TCP ReceiverOverviewIn Lab 2, you will implement the TCPReceiver, the part of a TCP implementation that handles the incoming byte stream. The TCPReceiver translates between incoming T">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CS144 Lab2 TCP receiver">
 <meta property="og:url" content="http://mayflyyh.github.io/2022/09/10/CS144-Lab2-TCP-receiver/index.html">
 <meta property="og:site_name" content="Mayflyyh&#39;s blog">
-<meta property="og:description" content="CS144 Lab Checkpoint 2OverviewIn Lab 2, you will implement the TCPReceiver, the part of a TCP implementation that handles the incoming byte stream. The TCPReceiver translates between incoming TCP segm">
+<meta property="og:description" content="CS144 Lab 2: The TCP ReceiverOverviewIn Lab 2, you will implement the TCPReceiver, the part of a TCP implementation that handles the incoming byte stream. The TCPReceiver translates between incoming T">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1663167576612.png">
 <meta property="article:published_time" content="2022-09-10T18:12:34.000Z">
-<meta property="article:modified_time" content="2022-09-14T07:01:23.981Z">
+<meta property="article:modified_time" content="2022-09-21T03:07:47.217Z">
 <meta property="article:author" content="Mayflyyh">
 <meta property="article:tag" content="lab">
 <meta property="article:tag" content="network">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1663167576612.png">
 
 
 <link rel="canonical" href="http://mayflyyh.github.io/2022/09/10/CS144-Lab2-TCP-receiver/">
@@ -111,7 +113,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CS144-Lab-Checkpoint-2"><span class="nav-number">1.</span> <span class="nav-text">CS144 Lab Checkpoint 2</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Overview"><span class="nav-number">1.1.</span> <span class="nav-text">Overview</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CS144-Lab-2-The-TCP-Receiver"><span class="nav-number">1.</span> <span class="nav-text">CS144 Lab 2: The TCP Receiver</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Overview"><span class="nav-number">1.1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Lab-2-The-TCP-Receiver"><span class="nav-number">1.2.</span> <span class="nav-text">3. Lab 2: The TCP Receiver</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Translating-between-64-bit-indexes-and-32-bit-seqnos"><span class="nav-number">1.2.1.</span> <span class="nav-text">3.1 Translating between 64-bit indexes and 32-bit seqnos</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Implementing-the-TCP-receiver"><span class="nav-number">1.2.2.</span> <span class="nav-text">3.2 Implementing the TCP receiver</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -124,7 +126,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -210,7 +212,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2022-09-14 07:01:23" itemprop="dateModified" datetime="2022-09-14T07:01:23+00:00">2022-09-14</time>
+      <time title="Modified: 2022-09-21 03:07:47" itemprop="dateModified" datetime="2022-09-21T03:07:47+00:00">2022-09-21</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -232,15 +234,59 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="CS144-Lab-Checkpoint-2"><a href="#CS144-Lab-Checkpoint-2" class="headerlink" title="CS144 Lab Checkpoint 2"></a>CS144 Lab Checkpoint 2</h1><h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>In Lab 2, you will implement the TCPReceiver, the part of a TCP implementation that handles the incoming byte stream. The TCPReceiver translates between incoming TCP segments (the payloads of datagrams carried over the Internet) and the incoming byte stream. </p>
+        <h1 id="CS144-Lab-2-The-TCP-Receiver"><a href="#CS144-Lab-2-The-TCP-Receiver" class="headerlink" title="CS144 Lab 2: The TCP Receiver"></a>CS144 Lab 2: The TCP Receiver</h1><h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>In Lab 2, you will implement the TCPReceiver, the part of a TCP implementation that handles the incoming byte stream. The TCPReceiver translates between incoming TCP segments (the payloads of datagrams carried over the Internet) and the incoming byte stream. </p>
 <span id="more"></span>
 
+<p><a target="_blank" rel="noopener" href="https://cs144.github.io/assignments/lab2.pdf">Read PDF</a></p>
 <p>In addition to writing to the incoming stream, the TCPReceiver is responsible for telling the sender two things: </p>
 <ol>
 <li>the index of the “first unassembled” byte, which is called the “acknowledgment number” or “ackno.” This is the first byte that the receiver needs from the sender. </li>
 <li>the distance between the “first unassembled” index and the “first unacceptable” index. This is called the “window size”.</li>
 </ol>
 <p>Together, the ackno and window size describe describes the receiver’s window: a range of indexes that the TCP sender is allowed to send. Using the window, the receiver can control the flow of incoming data, making the sender limit how much it sends until the receiver is ready for more. We sometimes refer to the ackno as the “left edge” of the window (smallest index the TCPReceiver is interested in), and the ackno + window size as the “right edge” (just beyond the largest index the TCPReceiver is interested in). </p>
+<h2 id="3-Lab-2-The-TCP-Receiver"><a href="#3-Lab-2-The-TCP-Receiver" class="headerlink" title="3. Lab 2: The TCP Receiver"></a>3. Lab 2: The TCP Receiver</h2><p>This week, you’ll implement the “receiver” part of TCP, responsible for receiving TCP segments (the actual datagram payloads), reassembling the byte stream (including its ending, when that occurs), and determining that signals that should be sent back to the sender for acknowledgment and flow control. </p>
+<h3 id="3-1-Translating-between-64-bit-indexes-and-32-bit-seqnos"><a href="#3-1-Translating-between-64-bit-indexes-and-32-bit-seqnos" class="headerlink" title="3.1 Translating between 64-bit indexes and 32-bit seqnos"></a>3.1 Translating between 64-bit indexes and 32-bit seqnos</h3><p>As a warmup, we’ll need to implement TCP’s way of representing indexes. Last week you created a StreamReassembler that reassembles substrings where each individual byte has a 64-bit stream index, with the first byte in the stream always having index zero. A 64-bit index is big enough that we can treat it as never overflowing.1 In the TCP headers, however, space is precious, and each byte’s index in the stream is represented not with a 64-bit index but with a 32-bit “sequence number,” or “seqno.” This adds three complexities: </p>
+<ol>
+<li><p>Your implementation needs to plan for 32-bit integers to wrap around. </p>
+</li>
+<li><p>TCP sequence numbers start at a random value </p>
+</li>
+<li><p>The logical beginning and ending each occupy one sequence number </p>
+</li>
+<li></li>
+</ol>
+<blockquote>
+<p><code>WrappingInt32 wrap(uint64 t n, WrappingInt32 isn)</code> </p>
+<p>Convert <code>absolute seqno</code> → <code>seqno</code>. Given an absolue sequence number (n) and an Initial Sequence Number ($isn$), produce the (relative) sequence number for $n$.</p>
+</blockquote>
+<p>$n+isn$ 即可</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">WrappingInt32 <span class="title function_">wrap</span><span class="params">(<span class="type">uint64_t</span> n, WrappingInt32 isn)</span> &#123;</span><br><span class="line">    DUMMY_CODE(n, isn);</span><br><span class="line">    <span class="type">uint64_t</span> isn64 = isn.raw_value();</span><br><span class="line">    <span class="type">uint32_t</span> res = n + isn64 ; </span><br><span class="line">    <span class="keyword">return</span> WrappingInt32&#123;res&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2. </p>
+<blockquote>
+<p><code>uint64 t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64 t checkpoint)</code></p>
+<p>Convert <code>seqno</code> → <code>absolute seqno</code>. Given a sequence number ($n$), the Initial Sequence Number ($isn$), and an absolute checkpoint sequence number, compute the absolute sequence number that corresponds to n that is closest to the checkpoint. </p>
+</blockquote>
+<p>先计算出 $n$ 对于 $checkpoint$ 在<code>wrap</code>下的偏移量，然后再加回  $checkpoint$，若小于 $0$ 则加一个$2^{32}$ 即可（这种情况会发生在 $(int)n&lt;0$ 时）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint64_t</span> <span class="title function_">unwrap</span><span class="params">(WrappingInt32 n, WrappingInt32 isn, <span class="type">uint64_t</span> checkpoint)</span> &#123;</span><br><span class="line">    DUMMY_CODE(n, isn, checkpoint);</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> diff = n - wrap(checkpoint,isn) + checkpoint;</span><br><span class="line">    <span class="keyword">if</span>(diff&lt;<span class="number">0</span>) diff += <span class="number">1ll</span>&lt;&lt;<span class="number">32</span>;</span><br><span class="line">    <span class="keyword">return</span> static_cast&lt;<span class="type">uint64_t</span>&gt; (diff);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-Implementing-the-TCP-receiver"><a href="#3-2-Implementing-the-TCP-receiver" class="headerlink" title="3.2 Implementing the TCP receiver"></a>3.2 Implementing the TCP receiver</h3><p>Congratulations on getting the wrapping and unwrapping logic right! We’d shake your hand if we could. In the rest of this lab, you’ll be implementing the TCPReceiver. It will </p>
+<ol>
+<li>receive segments from its peer</li>
+<li>reassemble the ByteStream using your StreamReassembler </li>
+<li>calculate the acknowledgment number (ackno) and the window size. The ackno and window size will eventually be transmitted back to the peer in an outgoing segment.</li>
+</ol>
+<p>First, please review the format of a TCP segment. This is the message that the two endpoints send each other; it is the payload of the lower-level datagrams. The non-grayed-out fields represent the information that’s of interest in this lab: </p>
+<ul>
+<li><p>the sequence number</p>
+</li>
+<li><p>the payload</p>
+</li>
+<li><p>the SYN and FIN flags.</p>
+</li>
+</ul>
+<p>These are the fields that are written by the sender, and read and acted on by the receiver. </p>
+<p><img src="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1663167576612.png" alt="1663167576612"></p>
 
     </div>
 
