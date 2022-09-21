@@ -19,20 +19,23 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"mayflyyh.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="xv6源码分析">
+    <meta name="description" content="xv6手册笔记与源码分析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="xv6 source code analysis">
 <meta property="og:url" content="http://mayflyyh.github.io/2022/09/20/xv6-source-code-analysis/index.html">
 <meta property="og:site_name" content="Mayflyyh&#39;s blog">
-<meta property="og:description" content="xv6源码分析">
+<meta property="og:description" content="xv6手册笔记与源码分析">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921183738227.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921192342270.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921192744071.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/20220920220342.png">
 <meta property="article:published_time" content="2022-09-20T20:33:51.000Z">
-<meta property="article:modified_time" content="2022-09-21T09:39:18.487Z">
+<meta property="article:modified_time" content="2022-09-21T12:14:27.096Z">
 <meta property="article:author" content="Mayflyyh">
 <meta property="article:tag" content="xv6">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/20220920220342.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921183738227.png">
 
 
 <link rel="canonical" href="http://mayflyyh.github.io/2022/09/20/xv6-source-code-analysis/">
@@ -112,7 +115,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Operating-system-interfaces"><span class="nav-number">1.</span> <span class="nav-text">Operating system interfaces</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Operating-system-organizaiton"><span class="nav-number">2.</span> <span class="nav-text">Operating system organizaiton</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Page-Table"><span class="nav-number">3.</span> <span class="nav-text">Page Table</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-7-Code-sbrk"><span class="nav-number">3.1.</span> <span class="nav-text">3.7 Code: sbrk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-8-Code-exec"><span class="nav-number">3.2.</span> <span class="nav-text">3.8 Code: exec</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#xv6-%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">xv6 启动过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#main-c"><span class="nav-number">4.1.</span> <span class="nav-text">main.c</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#kinit"><span class="nav-number">4.1.1.</span> <span class="nav-text">kinit()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kvminit"><span class="nav-number">4.1.2.</span> <span class="nav-text">kvminit()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#kvmmap"><span class="nav-number">4.1.2.1.</span> <span class="nav-text">kvmmap()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mappages"><span class="nav-number">4.1.2.2.</span> <span class="nav-text">mappages()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kvminithart"><span class="nav-number">4.1.3.</span> <span class="nav-text">kvminithart()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#procinit"><span class="nav-number">4.1.3.1.</span> <span class="nav-text">procinit()</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Operating-system-interfaces"><span class="nav-number">1.</span> <span class="nav-text">Operating system interfaces</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Operating-system-organizaiton"><span class="nav-number">2.</span> <span class="nav-text">Operating system organizaiton</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstracting-physical-resources"><span class="nav-number">2.1.</span> <span class="nav-text">Abstracting physical resources</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#User-mode-supervisor-mode-and-system-calls"><span class="nav-number">2.2.</span> <span class="nav-text">User mode, supervisor mode, and system calls</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Code-xv6-organization"><span class="nav-number">2.3.</span> <span class="nav-text">Code: xv6 organization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Process-overview"><span class="nav-number">2.4.</span> <span class="nav-text">Process overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Code-starting-xv6-the-first-process-and-system-call"><span class="nav-number">2.5.</span> <span class="nav-text">Code: starting xv6, the first process and system call</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Security-Model"><span class="nav-number">2.6.</span> <span class="nav-text">Security Model</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Page-Table"><span class="nav-number">3.</span> <span class="nav-text">Page Table</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-7-Code-sbrk"><span class="nav-number">3.1.</span> <span class="nav-text">3.7 Code: sbrk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-8-Code-exec"><span class="nav-number">3.2.</span> <span class="nav-text">3.8 Code: exec</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#xv6-%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">xv6 启动过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#main-c"><span class="nav-number">4.1.</span> <span class="nav-text">main.c</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#kinit"><span class="nav-number">4.1.1.</span> <span class="nav-text">kinit()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kvminit"><span class="nav-number">4.1.2.</span> <span class="nav-text">kvminit()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#kvmmap"><span class="nav-number">4.1.2.1.</span> <span class="nav-text">kvmmap()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mappages"><span class="nav-number">4.1.2.2.</span> <span class="nav-text">mappages()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kvminithart"><span class="nav-number">4.1.3.</span> <span class="nav-text">kvminithart()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#procinit"><span class="nav-number">4.1.3.1.</span> <span class="nav-text">procinit()</span></a></li></ol></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -211,7 +214,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2022-09-21 09:39:18" itemprop="dateModified" datetime="2022-09-21T09:39:18+00:00">2022-09-21</time>
+      <time title="Modified: 2022-09-21 12:14:27" itemprop="dateModified" datetime="2022-09-21T12:14:27+00:00">2022-09-21</time>
     </span>
 
   
@@ -224,11 +227,183 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>xv6源码分析</p>
+        <p>xv6手册笔记与源码分析</p>
 <span id="more"></span>
 
 <p>[TOC]</p>
-<h1 id="Operating-system-interfaces"><a href="#Operating-system-interfaces" class="headerlink" title="Operating system interfaces"></a>Operating system interfaces</h1><h1 id="Operating-system-organizaiton"><a href="#Operating-system-organizaiton" class="headerlink" title="Operating system organizaiton"></a>Operating system organizaiton</h1><h1 id="Page-Table"><a href="#Page-Table" class="headerlink" title="Page Table"></a>Page Table</h1><h2 id="3-7-Code-sbrk"><a href="#3-7-Code-sbrk" class="headerlink" title="3.7 Code: sbrk"></a>3.7 Code: sbrk</h2><h2 id="3-8-Code-exec"><a href="#3-8-Code-exec" class="headerlink" title="3.8 Code: exec"></a>3.8 Code: exec</h2><h1 id="xv6-启动过程"><a href="#xv6-启动过程" class="headerlink" title="xv6 启动过程"></a>xv6 启动过程</h1><p>启动过程</p>
+<h1 id="Operating-system-interfaces"><a href="#Operating-system-interfaces" class="headerlink" title="Operating system interfaces"></a>Operating system interfaces</h1><p>TO DO</p>
+<h1 id="Operating-system-organizaiton"><a href="#Operating-system-organizaiton" class="headerlink" title="Operating system organizaiton"></a>Operating system organizaiton</h1><p>Thus an operating system must fulfill three requirements: multiplexing, isolation, and interaction.</p>
+<p>Xv6 runs on a multi-core RISC-V microprocessor, and much of its low-level functionality (for example, its process implementation) is specific to RISC-V. RISC-V is a 64-bit CPU, and xv6 is written in “LP64” C, which means long (L) and pointers (P) in the C programming language are 64 bits, but int is 32-bit.</p>
+<p>附 <a target="_blank" rel="noopener" href="http://riscvbook.com/chinese/RISC-V-Reader-Chinese-v2p1.pdf">中文RISC-V手册</a></p>
+<h2 id="Abstracting-physical-resources"><a href="#Abstracting-physical-resources" class="headerlink" title="Abstracting physical resources"></a>Abstracting physical resources</h2><p>为什么要有操作系统？操作系统管理下层硬件，并为上层提供服务。</p>
+<p>为了实现强隔离，必须禁止应用程序直接访问硬件资源，而是利用操作系统提供的服务。比如UNIX应用程序只能用open，read，write和close与存储系统交互，而不能直接访问磁盘。操作系统提供了一个文件的抽象。</p>
+<p>UNIX也通过这种方式提供CPU资源</p>
+<h2 id="User-mode-supervisor-mode-and-system-calls"><a href="#User-mode-supervisor-mode-and-system-calls" class="headerlink" title="User mode, supervisor mode, and system calls"></a>User mode, supervisor mode, and system calls</h2><p>RISC-V 有三种模式，machine mode, supervisor mode, and user mode</p>
+<p>machine mode 有全部的权限，CPU启动时处于machine mode。machine mode主要用于配置计算机。xv6在machine mode下执行几行后就会切换到supervisor mode</p>
+<p>In supervisor mode the CPU is allowed to execute privileged instructions:</p>
+<ul>
+<li>enabling and disabling interrupts</li>
+<li>reading and writing the register that holds the address of a page table</li>
+<li>…</li>
+</ul>
+<p>CPU不会执行处于user mode的应用程序的privileged instruction。</p>
+<p>应用程序如果想要调用内核函数，必须切换到内核态。CPU提供一个特别的指令可以从user mode切换到supervisor mode (RISC-V provides the ecall instruction for this purpose.)</p>
+<p>如果切换到了supervisor mode，kernel 会验证参数是否合法。</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bio.c</td>
+<td>Disk block cache for the file system.</td>
+</tr>
+<tr>
+<td>console.c</td>
+<td>Connect to the user keyboard and screen.</td>
+</tr>
+<tr>
+<td>entry.S</td>
+<td>Very first boot instructions.</td>
+</tr>
+<tr>
+<td>exec.c</td>
+<td>exec() system call.</td>
+</tr>
+<tr>
+<td>file.c</td>
+<td>File descriptor support.</td>
+</tr>
+<tr>
+<td>fs.c</td>
+<td>File system.</td>
+</tr>
+<tr>
+<td>kalloc.c</td>
+<td>Physical page allocator.</td>
+</tr>
+<tr>
+<td>kernelvec.S</td>
+<td>Handle traps from kernel, and timer interrupts.</td>
+</tr>
+<tr>
+<td>log.c</td>
+<td>File system logging and crash recovery.</td>
+</tr>
+<tr>
+<td>main.c</td>
+<td>Control initialization of other modules during boot.</td>
+</tr>
+<tr>
+<td>pipe.c</td>
+<td>Pipes.</td>
+</tr>
+<tr>
+<td>plic.c</td>
+<td>RISC-V interrupt controller.</td>
+</tr>
+<tr>
+<td>printf.c</td>
+<td>Formatted output to the console.</td>
+</tr>
+<tr>
+<td>proc.c</td>
+<td>Processes and scheduling.</td>
+</tr>
+<tr>
+<td>sleeplock.c</td>
+<td>Locks that yield the CPU.</td>
+</tr>
+<tr>
+<td>spinlock.c</td>
+<td>Locks that don’t yield the CPU.</td>
+</tr>
+<tr>
+<td>start.c</td>
+<td>Early machine-mode boot code.</td>
+</tr>
+<tr>
+<td>string.c</td>
+<td>C string and byte-array library.</td>
+</tr>
+<tr>
+<td>swtch.S</td>
+<td>Thread switching.</td>
+</tr>
+<tr>
+<td>syscall.c</td>
+<td>Dispatch(调度) system calls to handling function.</td>
+</tr>
+<tr>
+<td>sysfile.c</td>
+<td>File-related system calls.</td>
+</tr>
+<tr>
+<td>sysproc.c</td>
+<td>Process-related system calls.</td>
+</tr>
+<tr>
+<td>trampoline.S</td>
+<td>Assembly code to switch between user and kernel.</td>
+</tr>
+<tr>
+<td>trap.c</td>
+<td>C code to handle and return from traps and interrupts.</td>
+</tr>
+<tr>
+<td>uart.c</td>
+<td>Serial-port console device driver.</td>
+</tr>
+<tr>
+<td>virtio_disk.c</td>
+<td>Disk device driver.</td>
+</tr>
+<tr>
+<td>vm.c</td>
+<td>Manage page tables and address spaces.</td>
+</tr>
+</tbody></table>
+<p>From this book’s perspective, microkernel and monolithic operating systems share many key ideas. They implement system calls, they use page tables, they handle interrupts, they support processes, they use locks for concurrency control, they implement a file system, etc. This book focuses on these core ideas.<br>Xv6 is implemented as a monolithic kernel, like most Unix operating systems. Thus, the xv6 kernel interface corresponds to the operating system interface, and the kernel implements the complete operating system. Since xv6 doesn’t provide many services, its kernel is smaller than some microkernels, but conceptually xv6 is monolithic.</p>
+<h2 id="Code-xv6-organization"><a href="#Code-xv6-organization" class="headerlink" title="Code: xv6 organization"></a>Code: xv6 organization</h2><p>kernel 的 inter-module interfaces 定义在 <code>/kernel/defs.h</code></p>
+<p><img src="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921183738227.png" alt="image-20220921183738227"></p>
+<h2 id="Process-overview"><a href="#Process-overview" class="headerlink" title="Process overview"></a>Process overview</h2><p>Xv6 uses page tables (which are implemented by hardware) to give each process its own address space. The RISC-V page table translates (or “maps”) a virtual address (the address that an RISC-V instruction manipulates) to a physical address (an address that the CPU chip sends to main memory).</p>
+<p>xv6为每个进程分别维护页表，定义为user’s address space.</p>
+<p>user’s address space 从虚拟地址的0开始，先是指令和全局变量，后有user stack和heap（用于malloc）。用户如果有需要，可以对heap进行拓展。</p>
+<p>RISCV只是用低39位在页表中寻找虚拟地址。xv6只是用39位中的38位。所以最大地址就是0x3fffffffff ，也就是MAXVA (kernel&#x2F;riscv.h:363)</p>
+<p>At the top of the address space xv6 reserves a page for a trampoline and a page mapping the process’s trapframe.</p>
+<p>xv6主要用这两个页面切入切出kernel</p>
+<p>The trampoline page contains the code to transition in and out of the kernel and mapping the trapframe is necessary to save&#x2F;restore the state of the user process.</p>
+<p>kernel维护了每个进程的状态。在<code>struct proc</code>中。</p>
+<p>一个进程最重要的kernel state是page table, kernel stack, run state.</p>
+<p>kernel可以挂起当前运行的状态，并且恢复另一个线程的状态。</p>
+<p>每个进程有user stack和kernel stack，当进程执行用户指令时使用user stack，而kernel stack为空。当进入kernel时（system call or interrupt），kernel在kernel stack上执行代码。显然kernel stack是独立的。</p>
+<p>一个进程可以通过调用<code>ecall</code>执行 system call。<code>ecall</code>可以提升硬件 privilege level 并且将 pc 切换到 a kernel-defined entry point. The code at the entry point switches to a kernel stack and executes the kernel instructions that implement the system call. 当kernel执行结束后，会调用<code>sret</code> 切换到 user stack 并且回到 user space 。</p>
+<p>进程的线程也会在kernel中阻塞以等待I&#x2F;O</p>
+<h2 id="Code-starting-xv6-the-first-process-and-system-call"><a href="#Code-starting-xv6-the-first-process-and-system-call" class="headerlink" title="Code: starting xv6, the first process and system call"></a>Code: starting xv6, the first process and system call</h2><p>When the RISC-V computer powers on, it initializes itself and runs a boot loader which is stored in read-only memory. The boot loader loads the xv6 kernel into memory. </p>
+<p>Then, in machine mode, the CPU executes xv6 starting at <code>_entry (kernel/entry.S:7).</code> The RISC-V starts with paging hardware disabled: virtual addresses map directly to physical addresses.</p>
+<p>loader将xv6 kernel载入在物理地址0x80000000. (0x0:0x80000000包含了I&#x2F;O设备)</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// kernel/entry.S</span></span><br><span class="line"></span><br><span class="line">		<span class="meta"># qemu -kernel loads the kernel at 0x80000000</span></span><br><span class="line">        <span class="meta"># and causes each hart (i.e. CPU) to jump there.</span></span><br><span class="line">        <span class="meta"># kernel.ld causes the following code to</span></span><br><span class="line">        <span class="meta"># be placed at 0x80000000.</span></span><br><span class="line">.section .text</span><br><span class="line">.global _entry</span><br><span class="line">_entry:</span><br><span class="line">        <span class="meta"># set up a stack for C.</span></span><br><span class="line">        # stack0 is declared in start.c,</span><br><span class="line">        <span class="meta"># with a 4096-byte stack per CPU.</span></span><br><span class="line">        <span class="meta"># sp = stack0 + (hartid * 4096)</span></span><br><span class="line">        la sp, stack0</span><br><span class="line">        li a0, <span class="number">1024</span>*<span class="number">4</span></span><br><span class="line">        csrr a1, mhartid</span><br><span class="line">        addi a1, a1, <span class="number">1</span></span><br><span class="line">        mul a0, a0, a1</span><br><span class="line">        add sp, sp, a0</span><br><span class="line">        <span class="meta"># jump to start() in start.c</span></span><br><span class="line">        call start</span><br><span class="line">spin:</span><br><span class="line">        j spin</span><br></pre></td></tr></table></figure>
+
+<p>sp &#x3D; stack0 + (hartid * 4096)</p>
+<p><img src="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921192342270.png" alt="image-20220921192342270"></p>
+<p><img src="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921192744071.png" alt="image-20220921192744071"></p>
+<p>The instructions at _entry set up a stack so that xv6 can run C code. Xv6 declares space for an initial stack, stack0, in the file start.c (kernel&#x2F;start.c:11). The code at _entry loads the stack pointer register sp with the address stack0+4096, the top of the stack, because the stack on RISC-V grows down. Now that the kernel has a stack, _entry calls into C code at start (kernel&#x2F;start.c:21).</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// kernel/start.c</span></span><br><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">start</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">// set M Previous Privilege mode to Supervisor, for mret.</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">long</span> x = r_mstatus();</span><br><span class="line">  x &amp;= ~MSTATUS_MPP_MASK;</span><br><span class="line">  x |= MSTATUS_MPP_S;</span><br><span class="line">  w_mstatus(x);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// set M Exception Program Counter to main, for mret.</span></span><br><span class="line">  <span class="comment">// requires gcc -mcmodel=medany</span></span><br><span class="line">  w_mepc((uint64)main);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// disable paging for now.</span></span><br><span class="line">  w_satp(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// delegate all interrupts and exceptions to supervisor mode.</span></span><br><span class="line">  w_medeleg(<span class="number">0xffff</span>);</span><br><span class="line">  w_mideleg(<span class="number">0xffff</span>);</span><br><span class="line">  w_sie(r_sie() | SIE_SEIE | SIE_STIE | SIE_SSIE);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// configure Physical Memory Protection to give supervisor mode</span></span><br><span class="line">  <span class="comment">// access to all of physical memory.</span></span><br><span class="line">  w_pmpaddr0(<span class="number">0x3fffffffffffff</span>ull);</span><br><span class="line">  w_pmpcfg0(<span class="number">0xf</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ask for clock interrupts.</span></span><br><span class="line">  timerinit();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// keep each CPU&#x27;s hartid in its tp register, for cpuid().</span></span><br><span class="line">  <span class="type">int</span> id = r_mhartid();</span><br><span class="line">  w_tp(id);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// switch to supervisor mode and jump to main().</span></span><br><span class="line">  <span class="keyword">asm</span> <span class="title function_">volatile</span><span class="params">(<span class="string">&quot;mret&quot;</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The function start performs some configuration that is only allowed in machine mode, and then switches to supervisor mode. To enter supervisor mode, RISC-V provides the instruction <code>mret</code>. This instruction is most often used to return from a previous call from supervisor mode to machine mode. start isn’t returning from such a call, and instead sets things up as if there had been one: it sets the previous privilege mode to supervisor in the register mstatus, it sets the return address to main by writing main’s address into the register <code>mepc</code>, disables virtual address translation in supervisor mode by writing 0 into the page-table register satp, and delegates all interrupts and exceptions to supervisor mode.</p>
+<p>Before jumping into supervisor mode, start performs one more task: it programs the clock chip to generate timer interrupts. With this housekeeping out of the way, start “returns” to supervisor mode by calling mret. This causes the program counter to change to main (kernel&#x2F;main.c:11).</p>
+<p>After main (kernel&#x2F;main.c:11) initializes several devices and subsystems, it creates the first process by calling userinit (kernel&#x2F;proc.c:233). The first process executes a small program written in RISC-V assembly, which makes the first system call in xv6. initcode.S (user&#x2F;initcode.S:3) loads the number for the exec system call, SYS_EXEC (kernel&#x2F;syscall.h:8), into register a7, and then calls ecall to re-enter the kernel.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Set up first user process.</span></span><br><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">userinit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">proc</span> *<span class="title">p</span>;</span></span><br><span class="line"></span><br><span class="line">  p = allocproc();</span><br><span class="line">  initproc = p;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// allocate one user page and copy init&#x27;s instructions</span></span><br><span class="line">  <span class="comment">// and data into it.</span></span><br><span class="line">  uvminit(p-&gt;pagetable, initcode, <span class="keyword">sizeof</span>(initcode));</span><br><span class="line">  p-&gt;sz = PGSIZE;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// prepare for the very first &quot;return&quot; from kernel to user.</span></span><br><span class="line">  p-&gt;trapframe-&gt;epc = <span class="number">0</span>;      <span class="comment">// user program counter</span></span><br><span class="line">  p-&gt;trapframe-&gt;sp = PGSIZE;  <span class="comment">// user stack pointer</span></span><br><span class="line"></span><br><span class="line">  safestrcpy(p-&gt;name, <span class="string">&quot;initcode&quot;</span>, <span class="keyword">sizeof</span>(p-&gt;name));</span><br><span class="line">  p-&gt;cwd = namei(<span class="string">&quot;/&quot;</span>);</span><br><span class="line"></span><br><span class="line">  p-&gt;state = RUNNABLE;</span><br><span class="line"></span><br><span class="line">  release(&amp;p-&gt;lock);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The kernel uses the number in register <code>a7</code> in <code>syscall</code> (kernel&#x2F;syscall.c:132) to call the desired system call. The system call table (kernel&#x2F;syscall.c:107) maps <code>SYS_EXEC</code> to <code>sys_exec</code>, which the kernel invokes. As we saw in Chapter 1, exec replaces the memory and registers of the current process with a new program (in this case, &#x2F;init). </p>
+<p>Once the kernel has completed <code>exec</code>, it returns to user space in the <code>/init</code> process. <code>init (user/init.c:15) </code>creates a new console device file if needed and then opens it as file descriptors 0, 1, and 2. Then it starts a shell on the console. The system is up.</p>
+<h2 id="Security-Model"><a href="#Security-Model" class="headerlink" title="Security Model"></a>Security Model</h2><p>TO DO</p>
+<h1 id="Page-Table"><a href="#Page-Table" class="headerlink" title="Page Table"></a>Page Table</h1><p>TO DO</p>
+<h2 id="3-7-Code-sbrk"><a href="#3-7-Code-sbrk" class="headerlink" title="3.7 Code: sbrk"></a>3.7 Code: sbrk</h2><p>TO DO</p>
+<h2 id="3-8-Code-exec"><a href="#3-8-Code-exec" class="headerlink" title="3.8 Code: exec"></a>3.8 Code: exec</h2><p>TO DO</p>
+<h1 id="xv6-启动过程"><a href="#xv6-启动过程" class="headerlink" title="xv6 启动过程"></a>xv6 启动过程</h1><p>启动过程</p>
 <h2 id="main-c"><a href="#main-c" class="headerlink" title="main.c"></a>main.c</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// kernel/main.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;types.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;param.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;memlayout.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;riscv.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;defs.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">volatile</span> <span class="type">static</span> <span class="type">int</span> started = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// start() jumps here in supervisor mode on all CPUs.</span></span><br><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span>(cpuid() == <span class="number">0</span>)&#123;</span><br><span class="line">    consoleinit();</span><br><span class="line">    printfinit();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;xv6 kernel is booting\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    kinit();         <span class="comment">// physical page allocator</span></span><br><span class="line">    kvminit();       <span class="comment">// create kernel page table</span></span><br><span class="line">    kvminithart();   <span class="comment">// turn on paging</span></span><br><span class="line">    procinit();      <span class="comment">// process table</span></span><br><span class="line">    trapinit();      <span class="comment">// trap vectors</span></span><br><span class="line">    trapinithart();  <span class="comment">// install kernel trap vector</span></span><br><span class="line">    plicinit();      <span class="comment">// set up interrupt controller</span></span><br><span class="line">    plicinithart();  <span class="comment">// ask PLIC for device interrupts</span></span><br><span class="line">    binit();         <span class="comment">// buffer cache</span></span><br><span class="line">    iinit();         <span class="comment">// inode cache</span></span><br><span class="line">    fileinit();      <span class="comment">// file table</span></span><br><span class="line">    virtio_disk_init(); <span class="comment">// emulated hard disk</span></span><br><span class="line">    userinit();      <span class="comment">// first user process</span></span><br><span class="line">    __sync_synchronize();</span><br><span class="line">    started = <span class="number">1</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">while</span>(started == <span class="number">0</span>)</span><br><span class="line">      ;</span><br><span class="line">    __sync_synchronize();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;hart %d starting\n&quot;</span>, cpuid());</span><br><span class="line">    kvminithart();    <span class="comment">// turn on paging</span></span><br><span class="line">    trapinithart();   <span class="comment">// install kernel trap vector</span></span><br><span class="line">    plicinithart();   <span class="comment">// ask PLIC for device interrupts</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  scheduler();        </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
 <h3 id="kinit"><a href="#kinit" class="headerlink" title="kinit()"></a>kinit()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">kinit</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  initlock(&amp;kmem.lock, <span class="string">&quot;kmem&quot;</span>);</span><br><span class="line">  freerange(end, (<span class="type">void</span>*)PHYSTOP);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
