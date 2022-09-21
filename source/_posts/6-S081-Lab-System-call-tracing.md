@@ -8,7 +8,7 @@ tags:
 - lab
 ---
 
-not difficult...
+还好
 
 <!-- more -->
 
@@ -80,9 +80,91 @@ if(((p->mask)>>num)&1)
 
 ## Sysinfo
 
+> - Add `$U/_sysinfotest` to UPROGS in Makefile
+>
+> - Run make qemu; `user/sysinfotest.c` will fail to compile. Add the system call sysinfo, following the same steps as in the previous assignment. To declare the prototype for sysinfo() `in user/user.h` you need predeclare the existence of `struct sysinfo`:
+>
+>   ```c
+>   struct sysinfo;
+>   int sysinfo(struct sysinfo *);
+>   ```
+>
+>​	   Once you fix the compilation issues, run sysinfotest; it will fail because    you haven't implemented the system call in the kernel yet.
+
+在`user/user.h`中添加`struct sysinfo`和`int sysinfo`的预定义即可
+
+> - sysinfo needs to copy a `struct sysinfo` back to user space; see `sys_fstat()` (`kernel/sysfile.c`) and `filestat()` (`kernel/file.c`) for examples of how to do that using `copyout()`.
+
+在kernel/sysproc.c中添加`sys_sysinfo()`函数，在`kernel/kalloc.c`中实现对未占用内存信息的收集，在`kernel/proc.c`中实现对进程数信息的收集
+
+```c
+//kernel/sysproc.c
+
+uint64
+sys_sysinfo(void)
+{
+    struct sysinfo info;
+    uint64 addr;
+    struct proc *p;
+
+    if(argaddr(0,&addr)<0){
+        return -1;
+    }
+    p = myproc();
+    info.freemem = kfreesize();
+    info.nproc = proccount();
+    if(copyout(p->pagetable, addr, (char *)&info, sizeof(info)) < 0)
+      return -1;
+    return 0;
+}
+```
+
+copyout就是将kernel space的东西拷贝到user space
+
+the amount of free memory 在 xv6 中就是查看有多少未被分配的页表
+
+```c
+//kernel/kalloc.c
+
+uint64 
+kfreesize(void)
+{
+    struct run *ptr ;
+    int cnt;
+
+    cnt = 0 ;
+    ptr = kmem.freelist;
+    while(ptr){
+        cnt++;
+        ptr = ptr->next;
+    }
+
+    return cnt * PGSIZE;
+}
+```
+
+the number of processes 即为多少进行部署unused
+
+```c
+//kernel/proc.c
+int
+proccount(void){
+  struct proc *p;
+  int cnt = 0 ;
+
+  for(p = proc; p < &proc[NPROC]; p++){
+    if(p->state != UNUSED)
+      cnt++;
+  }
+
+  return cnt;
+}
+```
+
+
+
+
 ![](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1663128399812.png)
 
 
-
-To complete.
 
