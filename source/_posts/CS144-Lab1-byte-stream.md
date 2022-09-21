@@ -16,7 +16,7 @@ Over the next four weeks, you’ll implement TCP, to provide the byte-stream abs
 
 <!-- more -->
 
-{% asset_img 1662711801508.png This is an example image %}
+![1662711801508](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1662711801508.png)
 
 Figure 1: The arrangement of modules and dataflow in your TCP implementation. The ByteStream was Lab. The job of TCP is to convey two **ByteStreams*** (one in each direction) over an unreliable datagram network, so that bytes written to the socket on one side of the connection emerge as bytes that can be read at the peer, and vice versa. Lab 1 is the **StreamReassembler***, and in Labs 2, 3, and 4 you’ll implement the **TCPReceiver**, **TCPSender**, and then the **TCPConnection** to tie it all together. 
 
@@ -34,6 +34,6 @@ The TCP sender is dividing its byte stream up into short segments (substrings no
 
 挺多细节很有意思，适合出成大模拟题！
 
-{% asset_img 1662741049597.png This is an example image %}
+![1662741049597](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1662741049597.png)
 
 第14个点慢应该是网络原因吧（）

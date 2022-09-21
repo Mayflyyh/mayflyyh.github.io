@@ -78,8 +78,11 @@ if(((p->mask)>>num)&1)
 
 
 
-## Sysinfo 
+## Sysinfo
 
-![1663128399812](6-S081-Lab-System-call-tracing/1663128399812.png)
+![](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1663128399812.png)
+
+
 
 To complete.
+

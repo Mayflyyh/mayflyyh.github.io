@@ -52,4 +52,5 @@ tags:
 
 利用 `|` 传输的数据直接用read读就好
 
-{% asset_img 1662954828683.png pic %}
+![1662954828683](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1662954828683.png)
+
