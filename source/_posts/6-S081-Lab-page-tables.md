@@ -1,5 +1,5 @@
 ---
-title: 6.S081 Lab: page tables
+title: '6.S081 Lab: page tables'
 date: 2022-09-23 00:49:32
 categories:
 - 6.S081
@@ -7,6 +7,12 @@ tags:
 - OS
 - lab
 ---
+
+继续做实验..
+
+<!-- more -->
+
+
 
 ## Print a page table
 
