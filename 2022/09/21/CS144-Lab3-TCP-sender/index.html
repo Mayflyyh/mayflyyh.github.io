@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mayflyyh.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="The TCPSender is a tool that translates from an outgoing byte stream to segments that will become the payloads of unreliable datagrams.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CS144 Lab3 TCP sender">
+<meta property="og:url" content="http://mayflyyh.github.io/2022/09/21/CS144-Lab3-TCP-sender/index.html">
+<meta property="og:site_name" content="Mayflyyh&#39;s blog">
+<meta property="og:description" content="The TCPSender is a tool that translates from an outgoing byte stream to segments that will become the payloads of unreliable datagrams.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921224147529.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220922190530721.png">
+<meta property="article:published_time" content="2022-09-21T22:34:03.000Z">
+<meta property="article:modified_time" content="2022-09-22T12:00:50.501Z">
+<meta property="article:author" content="Mayflyyh">
+<meta property="article:tag" content="lab">
+<meta property="article:tag" content="network">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921224147529.png">
+
+
+<link rel="canonical" href="http://mayflyyh.github.io/2022/09/21/CS144-Lab3-TCP-sender/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://mayflyyh.github.io/2022/09/21/CS144-Lab3-TCP-sender/","path":"2022/09/21/CS144-Lab3-TCP-sender/","title":"CS144 Lab3 TCP sender"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>CS144 Lab3 TCP sender | Mayflyyh's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Mayflyyh's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description"> </p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Lab-3-The-TCP-Sender"><span class="nav-number">1.</span> <span class="nav-text">Lab 3: The TCP Sender</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Before-start"><span class="nav-number">1.1.</span> <span class="nav-text">Before start</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCPTimer"><span class="nav-number">1.2.</span> <span class="nav-text">TCPTimer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fill-window"><span class="nav-number">1.3.</span> <span class="nav-text">fill_window</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ack-received"><span class="nav-number">1.4.</span> <span class="nav-text">ack_received</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tick"><span class="nav-number">1.5.</span> <span class="nav-text">tick</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#send-empty-segment"><span class="nav-number">1.6.</span> <span class="nav-text">send empty segment</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Mayflyyh</p>
+  <div class="site-description" itemprop="description">My blog</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://mayflyyh.github.io/2022/09/21/CS144-Lab3-TCP-sender/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Mayflyyh">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mayflyyh's blog">
+      <meta itemprop="description" content="My blog">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="CS144 Lab3 TCP sender | Mayflyyh's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CS144 Lab3 TCP sender
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-09-21 22:34:03" itemprop="dateCreated datePublished" datetime="2022-09-21T22:34:03+00:00">2022-09-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-09-22 12:00:50" itemprop="dateModified" datetime="2022-09-22T12:00:50+00:00">2022-09-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CS144/" itemprop="url" rel="index"><span itemprop="name">CS144</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>The <strong>TCPSender</strong> is a tool that translates from an outgoing byte stream to segments that will become the payloads of unreliable datagrams.</p>
+<span id="more"></span>
+
+<p>Lab0: the abstraction of a flow-controlled byte stream (<strong>ByteStream</strong>).</p>
+<p>Lab1,2 the tools that translate from segments carried in unreliable datagrams to an incoming byte stream: the <strong>StreamReassembler</strong> and <strong>TCPReceiver</strong></p>
+<p>This Lab3:</p>
+<p>The <strong>TCPSender</strong> is a tool that translates from an outgoing byte stream to segments that will become the payloads of unreliable datagrams.</p>
+<p><img src="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220921224147529.png" alt="image-20220921224147529"></p>
+<h2 id="Lab-3-The-TCP-Sender"><a href="#Lab-3-The-TCP-Sender" class="headerlink" title="Lab 3: The TCP Sender"></a>Lab 3: The TCP Sender</h2><p>This week, you’ll implement the “sender” part of TCP, responsible for reading from a ByteStream (created and written to by some sender-side application), and turning the stream into a sequence of outgoing TCP segments. On the remote side, a TCP receiver transforms those segments (those that arrive—they might not all make it) back into the original byte stream, and sends acknowledgments and window advertisements back to the sender.</p>
+<p>It will be your TCPSender’s responsibility to:</p>
+<ul>
+<li>Keep track of the receiver’s window (processing incoming acknos and window sizes)</li>
+<li>Fill the window when possible, by reading from the ByteStream, creating new TCP segments (including SYN and FIN flags if needed), and sending them. The sender should keep sending segments until either the window is full or the ByteStream is empty.</li>
+<li>Keep track of which segments have been sent but not yet acknowledged by the receiver— we call these “outstanding” segments</li>
+<li>Re-send outstanding segments if enough time passes since they were sent, and they haven’t been acknowledged yet</li>
+</ul>
+<p>The basic principle is to send whatever the receiver will allow us to send (filling the window), and keep retransmitting until the receiver acknowledges each segment. This is called “automatic repeat request” (ARQ). The sender divides the byte stream up into segments and sends them, as much as the receiver’s window allows.</p>
+<hr>
+<img src="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220922190530721.png" alt="image-20220922190530721" style="zoom:50%;">
+
+<p>写完了，但欲哭无泪，犯了很多细节错误</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//tcp_sender.hh</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> SPONGE_LIBSPONGE_TCP_SENDER_HH</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPONGE_LIBSPONGE_TCP_SENDER_HH</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;byte_stream.hh&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;tcp_config.hh&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;tcp_segment.hh&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;wrapping_integers.hh&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cassert&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;queue&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;set&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TCPTimer</span> &#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">// 全局时间</span></span><br><span class="line">    <span class="type">size_t</span> _current_time;</span><br><span class="line">    <span class="comment">// TCPTimer启动时的时间</span></span><br><span class="line">    <span class="type">size_t</span> _start_time;</span><br><span class="line">    <span class="comment">// 是否处于RUNNING状态</span></span><br><span class="line">    <span class="type">bool</span> _RUNNING;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">TCPTimer</span>();</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">start</span><span class="params">(<span class="type">bool</span> restart)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">stop</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">updateTime</span><span class="params">(<span class="type">size_t</span> _time)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">size_t</span> <span class="title">getTimeGap</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//! \brief The &quot;sender&quot; part of a TCP implementation.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//! Accepts a ByteStream, divides it up into segments and sends the</span></span><br><span class="line"><span class="comment">//! segments, keeps track of which segments are still in-flight,</span></span><br><span class="line"><span class="comment">//! maintains the Retransmission Timer, and retransmits in-flight</span></span><br><span class="line"><span class="comment">//! segments if the retransmission timer expires.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TCPSender</span> &#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">//! our initial sequence number, the number for our SYN.</span></span><br><span class="line">    WrappingInt32 _isn;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! outbound queue of segments that the TCPSender wants sent</span></span><br><span class="line">    std::queue&lt;TCPSegment&gt; _segments_out&#123;&#125;;</span><br><span class="line">    std::queue&lt;TCPSegment&gt; _outstanding_segments&#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! retransmission timer for the connection</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> _initial_retransmission_timeout;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> _current_retransmission_timeout;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! outgoing stream of bytes that have not yet been sent</span></span><br><span class="line">    ByteStream _stream;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! the (absolute) sequence number for the next byte to be sent</span></span><br><span class="line">    <span class="type">uint64_t</span> _next_seqno&#123;<span class="number">0</span>&#125;;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">//! 保存最新的 ackno</span></span><br><span class="line">    <span class="type">uint64_t</span> _ackno&#123;<span class="number">0</span>&#125;;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">//! 保存最新的window_size</span></span><br><span class="line">    <span class="type">uint64_t</span> _window_size;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 时间记录器</span></span><br><span class="line">    TCPTimer _timer;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//! 记录已发送但还没有被确认的字节数</span></span><br><span class="line">    <span class="type">uint64_t</span> _bytes_in_flight&#123;<span class="number">0</span>&#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//! 记录重发次数</span></span><br><span class="line">    <span class="type">uint64_t</span> _consecutive_retransmissions&#123;<span class="number">0</span>&#125;;</span><br><span class="line">    <span class="type">bool</span> _end&#123;<span class="literal">false</span>&#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//! Initialize a TCPSender</span></span><br><span class="line">    <span class="built_in">TCPSender</span>(<span class="type">const</span> <span class="type">size_t</span> capacity = TCPConfig::DEFAULT_CAPACITY,</span><br><span class="line">              <span class="type">const</span> <span class="type">uint16_t</span> retx_timeout = TCPConfig::TIMEOUT_DFLT,</span><br><span class="line">              <span class="type">const</span> std::optional&lt;WrappingInt32&gt; fixed_isn = &#123;&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \name &quot;Input&quot; interface for the writer</span></span><br><span class="line">    <span class="comment">//!@&#123;</span></span><br><span class="line">    <span class="function">ByteStream &amp;<span class="title">stream_in</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> _stream; &#125;</span><br><span class="line">    <span class="function"><span class="type">const</span> ByteStream &amp;<span class="title">stream_in</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> _stream; &#125;</span><br><span class="line">    <span class="comment">//!@&#125;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \name Methods that can cause the TCPSender to send a segment</span></span><br><span class="line">    <span class="comment">//!@&#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief A new acknowledgment was received</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">ack_received</span><span class="params">(<span class="type">const</span> WrappingInt32 ackno, <span class="type">const</span> <span class="type">uint16_t</span> window_size)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief Generate an empty-payload segment (useful for creating empty ACK segments)</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">send_empty_segment</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief create and send segments to fill as much of the window as possible</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">fill_window</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief Notifies the TCPSender of the passage of time</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">tick</span><span class="params">(<span class="type">const</span> <span class="type">size_t</span> ms_since_last_tick)</span></span>;</span><br><span class="line">    <span class="comment">//!@&#125;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \name Accessors</span></span><br><span class="line">    <span class="comment">//!@&#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief How many sequence numbers are occupied by segments sent but not yet acknowledged?</span></span><br><span class="line">    <span class="comment">//! \note count is in &quot;sequence space,&quot; i.e. SYN and FIN each count for one byte</span></span><br><span class="line">    <span class="comment">//! (see TCPSegment::length_in_sequence_space())</span></span><br><span class="line">    <span class="function"><span class="type">size_t</span> <span class="title">bytes_in_flight</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief Number of consecutive retransmissions that have occurred in a row</span></span><br><span class="line">    <span class="function"><span class="type">unsigned</span> <span class="type">int</span> <span class="title">consecutive_retransmissions</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief TCPSegments that the TCPSender has enqueued for transmission.</span></span><br><span class="line">    <span class="comment">//! \note These must be dequeued and sent by the TCPConnection,</span></span><br><span class="line">    <span class="comment">//! which will need to fill in the fields that are set by the TCPReceiver</span></span><br><span class="line">    <span class="comment">//! (ackno and window size) before sending.</span></span><br><span class="line">    <span class="function">std::queue&lt;TCPSegment&gt; &amp;<span class="title">segments_out</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> _segments_out; &#125;</span><br><span class="line">    <span class="comment">//!@&#125;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \name What is the next sequence number? (used for testing)</span></span><br><span class="line">    <span class="comment">//!@&#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief absolute seqno for the next byte to be sent</span></span><br><span class="line">    <span class="function"><span class="type">uint64_t</span> <span class="title">next_seqno_absolute</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> _next_seqno; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief relative seqno for the next byte to be sent</span></span><br><span class="line">    <span class="function">WrappingInt32 <span class="title">next_seqno</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">wrap</span>(_next_seqno, _isn); &#125;</span><br><span class="line">    <span class="comment">//!@&#125;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span>  <span class="comment">// SPONGE_LIBSPONGE_TCP_SENDER_HH</span></span></span><br></pre></td></tr></table></figure>
+
+<p>以上是头文件</p>
+<h3 id="Before-start"><a href="#Before-start" class="headerlink" title="Before start"></a>Before start</h3><ul>
+<li><p>What should my TCPSender assume as the receiver’s window size before I’ve gotten an ACK from the receiver? </p>
+<p>One byte.</p>
+</li>
+<li><p>Wait, how do I both “send” a segment and also keep track of that same segment as being outstanding, so I know what to retransmit later? Don’t I have to make a copy of each segment then? Is that wasteful? </p>
+<p>When you send a segment that contains data, you’ll probably want to push it on to the segments out queue and also keep a copy of it internally in a data structure that lets you keep track of outstanding segments for possible retransmission. This turns out not to be very wasteful because the segment’s payload is stored as a reference-counted read-only string (a Buffer object). So don’t worry about it—it’s not actually copying the payload data.</p>
+</li>
+</ul>
+<p>这里也说到了如果会通过引用计数的 Buffer 来优化空间，不会造成空间浪费。</p>
+<h3 id="TCPTimer"><a href="#TCPTimer" class="headerlink" title="TCPTimer"></a>TCPTimer</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//tcp_sender.cc</span></span><br><span class="line">TCPTimer::<span class="built_in">TCPTimer</span>() : _current_time(<span class="number">0</span>), _start_time(<span class="number">0</span>), _RUNNING(<span class="number">0</span>) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TCPTimer::start</span><span class="params">(<span class="type">bool</span> restart)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//restart 是否是重新启动？</span></span><br><span class="line">    <span class="keyword">if</span> (restart || _RUNNING == <span class="literal">false</span>) &#123;</span><br><span class="line">        _RUNNING = <span class="literal">true</span>;</span><br><span class="line">        _start_time = _current_time;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TCPTimer::stop</span><span class="params">()</span> </span>&#123; _RUNNING = <span class="literal">false</span>; &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TCPTimer::updateTime</span><span class="params">(<span class="type">size_t</span> _time)</span> </span>&#123; _current_time += _time; &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">TCPTimer::getTimeGap</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> _current_time - _start_time; &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>TCPTimer</code> 类，用于更新当前时间，以及记录开始计时时间和停止时间，以及获取当前时间与现在时间的差（会与 retransmission timeout (RTO) 进行比较）</p>
+<ul>
+<li><p>When to start ?</p>
+<blockquote>
+<p>How does the TCPSender know if a segment was lost?</p>
+<ol start="4">
+<li>Every time a segment containing data (nonzero length in sequence space) is sent (whether it’s the first time or a retransmission), if the timer is not running, **start **it running so that it will expire after RTO milliseconds (for the current value of RTO).</li>
+</ol>
+<p>  By “expire,” we mean that the time will run out a certain number of milliseconds in the future.</p>
+</blockquote>
+</li>
+</ul>
+<p>也就是说当发送一段 sequence space 不为0的 tcpsegment 时，如果 timer 不处于 running状态，那么此时就开始计时。</p>
+<ul>
+<li><p>When to stop ? </p>
+<blockquote>
+<ol start="5">
+<li>When all outstanding data has been acknowledged, **stop **the retransmission timer</li>
+</ol>
+</blockquote>
+</li>
+</ul>
+<h3 id="fill-window"><a href="#fill-window" class="headerlink" title="fill_window"></a>fill_window</h3><blockquote>
+<p>The TCPSender is asked to fill the window: it reads from its input ByteStream and sends as many bytes as possible in the form of TCPSegments, as long as there are new bytes to be read and space available in the window. You’ll want to make sure that every TCPSegment you send fits fully inside the receiver’s window. Make each individual TCPSegment as big as possible, but no bigger than the value given by TCPConfig::MAX PAYLOAD SIZE (1452 bytes). You can use the TCPSegment::length in sequence space() method to count the total number of sequence numbers occupied by a segment. Remember that the SYN and FIN flags also occupy a sequence number each, which means that they occupy space in the window.</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">TCPSender::fill_window</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (_end) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">size_t</span> size = _ackno + (_window_size ? _window_size : <span class="number">1</span>) - _next_seqno;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (size &gt; <span class="number">0</span> &amp;&amp; !_end) &#123;</span><br><span class="line">        TCPSegment message;</span><br><span class="line">        TCPHeader &amp;header = message.<span class="built_in">header</span>();</span><br><span class="line">        Buffer &amp;payload = message.<span class="built_in">payload</span>();</span><br><span class="line">        header.seqno = <span class="built_in">wrap</span>(_next_seqno, _isn);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (_next_seqno == <span class="number">0</span>) &#123;</span><br><span class="line">            header.syn = <span class="literal">true</span>;</span><br><span class="line">            size -= <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        payload = _stream.<span class="built_in">read</span>(<span class="built_in">min</span>(size, TCPConfig::MAX_PAYLOAD_SIZE));</span><br><span class="line">        size -= payload.<span class="built_in">size</span>();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (_stream.<span class="built_in">eof</span>() &amp;&amp; size &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            header.fin = <span class="literal">true</span>;</span><br><span class="line">            size -= <span class="number">1</span>;</span><br><span class="line">            _end = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (message.<span class="built_in">length_in_sequence_space</span>() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        _bytes_in_flight += message.<span class="built_in">length_in_sequence_space</span>();</span><br><span class="line">        _next_seqno = _next_seqno + message.<span class="built_in">length_in_sequence_space</span>();</span><br><span class="line"></span><br><span class="line">        _segments_out.<span class="built_in">push</span>(message);</span><br><span class="line">        _outstanding_segments.<span class="built_in">push</span>(message);</span><br><span class="line"></span><br><span class="line">        _timer.<span class="built_in">start</span>(<span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>L5 :</p>
+<blockquote>
+<p>What should I do if the window size is zero? </p>
+<p>If the receiver has announced a window size of zero, the fill window method should act like the window size is one. The sender might end up sending a single byte that gets rejected (and not acknowledged) by the receiver, but this can also provoke the receiver into sending a new acknowledgment segment where it reveals that more space has opened up in its window. Without this, the sender would never learn that it was allowed to start sending again.</p>
+</blockquote>
+<p>就是说在 fill window 时，如果 window size 是 0，那么就将 window size 视为 1 ，这样才能保持 sender 继续向 receiver 发送信息，如果视为 0 那么就不能向 receiver 发送任何信息了。</p>
+<p>然后定义 size 为 当前 window 剩余的 size 大小，window 的范围是 $[ackno,ackno+window size]$ </p>
+<blockquote>
+<p>void ack received()</p>
+<ol start="2">
+<li>A segment is received from the receiver, conveying the new left (&#x3D; ackno) and right (&#x3D; ackno + window size) edges of the window</li>
+</ol>
+</blockquote>
+<p>这里要明确 <code>sequence number</code> 这个概念，详见 Lab2 的 </p>
+<blockquote>
+<ol start="3">
+<li>The logical beginning and ending each occupy one sequence number: In addition to ensuring the receipt of all bytes of data, TCP makes sure that the beginning and ending of the stream are received reliably. Thus, in TCP the <strong>SYN</strong> (beginning-ofstream) and <strong>FIN</strong> (end-of-stream) control flags are assigned sequence numbers. Each of these occupies one sequence number. (The sequence number occupied by the SYN flag is the ISN.) <strong>Each byte of data in the stream also occupies one sequence number</strong>. Keep in mind that SYN and FIN aren’t part of the stream itself and aren’t “bytes”—they represent the beginning and ending of the byte stream itself.</li>
+</ol>
+</blockquote>
+<p>也就是说，只有 SYN ，FIN，和 TCPSegment 中的 payload 在计算 sequence number 被考虑到，占用 sequence space</p>
+<p>L18: 需要考虑 <code>_stream</code> 以及 <code>_stream.read(int)</code> 的一些特性</p>
+<p>L27: 不需要发送 sequence space 为空的 TCPSegment</p>
+<h3 id="ack-received"><a href="#ack-received" class="headerlink" title="ack_received"></a>ack_received</h3><blockquote>
+<p>A segment is received from the receiver, conveying the new left (&#x3D; ackno) and right (&#x3D; ackno + window size) edges of the window. The TCPSender should look through its collection of outstanding segments and remove any that have now been fully acknowledged (the ackno is greater than all of the sequence numbers in the segment). The TCPSender should fill the window again if new space has opened up.</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">TCPSender::ack_received</span><span class="params">(<span class="type">const</span> WrappingInt32 ackno, <span class="type">const</span> <span class="type">uint16_t</span> window_size)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">DUMMY_CODE</span>(ackno, window_size);</span><br><span class="line">    <span class="type">uint64_t</span> _new_ackno = <span class="built_in">unwrap</span>(ackno, _isn, _ackno);</span><br><span class="line"></span><br><span class="line">    <span class="type">bool</span> isnew_ack = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (_new_ackno &gt; _next_seqno)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    _window_size = window_size;</span><br><span class="line">    <span class="keyword">if</span> (_new_ackno &lt;= _ackno)</span><br><span class="line">        isnew_ack = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (isnew_ack) &#123;</span><br><span class="line">        _ackno = _new_ackno;</span><br><span class="line">        <span class="keyword">while</span> (!_outstanding_segments.<span class="built_in">empty</span>() &amp;&amp; ackno != (_outstanding_segments.<span class="built_in">front</span>().<span class="built_in">header</span>().seqno +</span><br><span class="line">                                                           _outstanding_segments.<span class="built_in">front</span>().<span class="built_in">length_in_sequence_space</span>())) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!_outstanding_segments.<span class="built_in">empty</span>() &amp;&amp;</span><br><span class="line">                _new_ackno &lt; <span class="built_in">unwrap</span>(_outstanding_segments.<span class="built_in">front</span>().<span class="built_in">header</span>().seqno, _isn, _ackno) +</span><br><span class="line">                                 <span class="built_in">static_cast</span>&lt;<span class="type">uint64_t</span>&gt;(_outstanding_segments.<span class="built_in">front</span>().<span class="built_in">length_in_sequence_space</span>())) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            _ackno = _new_ackno;</span><br><span class="line">            _bytes_in_flight -= _outstanding_segments.<span class="built_in">front</span>().<span class="built_in">length_in_sequence_space</span>();</span><br><span class="line">            _outstanding_segments.<span class="built_in">pop</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!_outstanding_segments.<span class="built_in">empty</span>() &amp;&amp; ackno == (_outstanding_segments.<span class="built_in">front</span>().<span class="built_in">header</span>().seqno +</span><br><span class="line">                                                        _outstanding_segments.<span class="built_in">front</span>().<span class="built_in">length_in_sequence_space</span>())) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!_outstanding_segments.<span class="built_in">empty</span>() &amp;&amp;</span><br><span class="line">                _new_ackno &lt; <span class="built_in">unwrap</span>(_outstanding_segments.<span class="built_in">front</span>().<span class="built_in">header</span>().seqno, _isn, _ackno) +</span><br><span class="line">                                 <span class="built_in">static_cast</span>&lt;<span class="type">uint64_t</span>&gt;(_outstanding_segments.<span class="built_in">front</span>().<span class="built_in">length_in_sequence_space</span>())) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            _ackno = _new_ackno;</span><br><span class="line">            _bytes_in_flight -= _outstanding_segments.<span class="built_in">front</span>().<span class="built_in">length_in_sequence_space</span>();</span><br><span class="line">            _outstanding_segments.<span class="built_in">pop</span>();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        _current_retransmission_timeout = _initial_retransmission_timeout;</span><br><span class="line">        _timer.<span class="built_in">stop</span>();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!_outstanding_segments.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">            _timer.<span class="built_in">start</span>(<span class="literal">true</span>);</span><br><span class="line">            _current_retransmission_timeout = _initial_retransmission_timeout;</span><br><span class="line">        &#125;</span><br><span class="line">        _consecutive_retransmissions = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>When the receiver gives the sender an ackno that acknowledges the successful receipt of new data (the ackno reflects an absolute sequence number bigger than any previous ackno): </p>
+<p>(a) Set the RTO back to its “initial value.” </p>
+<p>(b) If the sender has any outstanding data, restart the retransmission timer so that it will expire after RTO milliseconds (for the current value of RTO). </p>
+<p>(c) Reset the count of “consecutive retransmissions” back to zero.</p>
+</blockquote>
+<p>当收到新的 ackno 时需要将 RTO 置回初始值，如果需要计数则重新开始计数，并且将连续重发次数置回0</p>
+<p>这里细节比较多，我有一个问题是</p>
+<blockquote>
+<p>真实世界中会出现返回的ack是从整段seq中间截断的情况吗？<br>比如发一个seq&#x3D;1,”abcdefg”，返回ack&#x3D;3这样。</p>
+</blockquote>
+<h3 id="tick"><a href="#tick" class="headerlink" title="tick"></a>tick</h3><blockquote>
+<p>Time has passed — a certain number of milliseconds since the last time this method was called. The sender may need to retransmit an outstanding segment.</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">TCPSender::tick</span><span class="params">(<span class="type">const</span> <span class="type">size_t</span> ms_since_last_tick)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">DUMMY_CODE</span>(ms_since_last_tick);</span><br><span class="line">    _timer.<span class="built_in">updateTime</span>(ms_since_last_tick);</span><br><span class="line">    <span class="keyword">if</span> (!_outstanding_segments.<span class="built_in">empty</span>() &amp;&amp; _current_retransmission_timeout &lt;= _timer.<span class="built_in">getTimeGap</span>()) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!_outstanding_segments.<span class="built_in">empty</span>())</span><br><span class="line">            _segments_out.<span class="built_in">push</span>(_outstanding_segments.<span class="built_in">front</span>());</span><br><span class="line">        <span class="keyword">if</span> (_window_size) &#123;</span><br><span class="line">            _consecutive_retransmissions += <span class="number">1</span>;</span><br><span class="line">            _current_retransmission_timeout *= <span class="number">2</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        _timer.<span class="built_in">start</span>(<span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol start="2">
+<li><p>When the TCPSender is constructed, it’s given an argument that tells it the “initial value” of the retransmission timeout (RTO). The RTO is the number of milliseconds to wait before resending an outstanding TCP segment. The value of the RTO will change over time, but the “initial value” stays the same. The starter code saves the “initial value” of the RTO in a member variable called initial retransmission timeout.</p>
+</li>
+<li><p>If tick is called and the retransmission timer has expired: </p>
+<p>(a). Retransmit the earliest (lowest sequence number) segment that hasn’t been fully acknowledged by the TCP receiver. You’ll need to be storing the outstanding segments in some internal data structure that makes it possible to do this. </p>
+<p>(b). If the window size is nonzero: i. Keep track of the number of consecutive retransmissions, and increment it because you just retransmitted something. Your TCPConnection will use this information to decide if the connection is hopeless (too many consecutive retransmissions in a row) and needs to be aborted. ii. Double the value of RTO. This is called “exponential backoff”—it slows down retransmissions on lousy networks to avoid further gumming up the works. </p>
+<p>(c). Reset the retransmission timer and start it such that it expires after RTO milliseconds (taking into account that you may have just doubled the value of RTO!).</p>
+</li>
+</ol>
+</blockquote>
+<p>注意重发时不需要把重发的 TCPSegment 当作新的 TCPSegment 而重新追踪。</p>
+<h3 id="send-empty-segment"><a href="#send-empty-segment" class="headerlink" title="send empty segment"></a>send empty segment</h3><blockquote>
+<p>The TCPSender should generate and send a TCPSegment that has zero length in sequence space, and with the sequence number set correctly. This is useful if the owner (the TCPConnection that you’re going to implement next week) wants to send an empty ACK segment. </p>
+<p>Note: a segment like this one, which occupies no sequence numbers, doesn’t need to be kept track of as “outstanding” and won’t ever be retransmitted.</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">TCPSender::send_empty_segment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    TCPSegment message;</span><br><span class="line">    TCPHeader &amp;header = message.<span class="built_in">header</span>();</span><br><span class="line">    header.seqno = <span class="built_in">wrap</span>(_next_seqno, _isn);</span><br><span class="line">    _segments_out.<span class="built_in">push</span>(message);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/lab/" rel="tag"># lab</a>
+              <a href="/tags/network/" rel="tag"># network</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/09/20/xv6-source-code-analysis/" rel="prev" title="xv6 source code analysis">
+                  <i class="fa fa-chevron-left"></i> xv6 source code analysis
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mayflyyh</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
