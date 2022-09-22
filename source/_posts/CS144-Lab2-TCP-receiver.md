@@ -1,5 +1,6 @@
 ---
 title: CS144 Lab2 TCP receiver
+mathjax: true
 date: 2022-09-10 18:12:34
 categories:
 - CS144
@@ -19,6 +20,8 @@ tags:
 In Lab 2, you will implement the TCPReceiver, the part of a TCP implementation that handles the incoming byte stream. The TCPReceiver translates between incoming TCP segments (the payloads of datagrams carried over the Internet) and the incoming byte stream. 
 
 [Read PDF](https://cs144.github.io/assignments/lab2.pdf)
+
+$$1$$
 
 In addition to writing to the incoming stream, the TCPReceiver is responsible for telling the sender two things: 
 
@@ -41,11 +44,9 @@ As a warmup, we’ll need to implement TCP’s way of representing indexes. Last
 2. TCP sequence numbers start at a random value 
 3. The logical beginning and ending each occupy one sequence number 
 
-1. 
-
 > `WrappingInt32 wrap(uint64 t n, WrappingInt32 isn)` 
 >
-> Convert `absolute seqno` → `seqno`. Given an absolue sequence number (n) and an Initial Sequence Number ($isn$), produce the (relative) sequence number for $n$.
+> Convert `absolute seqno` → `seqno`. Given an absolue sequence number (n) and an Initial Sequence Number (isn), produce the (relative) sequence number for n.
 
 $n+isn$ 即可
 
