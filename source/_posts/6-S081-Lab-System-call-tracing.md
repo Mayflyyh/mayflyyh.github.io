@@ -1,5 +1,5 @@
 ---
-title: '6.S081 Lab: System call tracing'
+title: 6.S081 Lab: System call tracing
 date: 2022-09-13 22:36:36
 categories:
 - 6.S081

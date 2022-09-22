@@ -249,13 +249,189 @@ TO DO
 
 TO DO
 
-## 3.7 Code: sbrk
+## Kernel address space
+
+xv6 为每个进程维护一个页表，描述每个用户的用户地址空间，另外还维护一个描述内核地址空间的页表。
+
+The kernel configures the layout of its address space to give itself access to physical memory and various hardware resources at predictable virtual addresses.
+
+The file (kernel/memlayout.h) declares the constants for xv6’s kernel memory layout.
+
+![](https://raw.githubusercontent.com/Mayflyyh/picrepo/main/image-20220922232341836.png)
+
+QEMU 模拟了计算机，在 RAM 的 0x80000000 处启动，并且至少执行到 0x88000000。
+
+QEMU 向软件公开设备接口（0x80000000 以下的 memory-mapped control registers）。
+
+内核可以通过读写特定的物理地址与这些设备交互。
+
+内核使用 `direct mapping` 的方式获取 RAM 和 memory-mapped device registers ，也就是说他们的虚拟地址和物理地址是相等的。`Direct mapping` 简化了读写物理内存的内核代码。比如说当 `fork` 为子进程分配用户内存时，allocator 会直接返回内存的物理地址。当fork 把父进程用户内存拷贝给儿子时，fork 会直接把这个地址当成虚拟地址。
+
+有一些内核的虚拟地址不会采用直接映射的方式：
+
+- The trampoline page.
+
+  它被映射到虚拟地址的顶部。用户页表也会有这个映射。
+
+  可以发现包含 trampoline code 的物理页被映射到内核的虚拟地址了两次，一次在虚拟地址的顶部，一次是直接映射。
+
+- The kernel stack pages. 
+
+  Each process has its own kernel stack, which is mapped high so that below it xv6 can leave an unmapped guard page. The guard page’s PTE is invalid (i.e., PTE_V is not set), so that if the kernel overflows a kernel stack, it will likely cause an exception and the kernel will panic. Without a guard page an overflowing stack would overwrite other kernel memory, resulting in incorrect operation. A panic crash is preferable.
+
+The kernel maps the pages for the trampoline and the kernel text with the permissions PTE_R and PTE_X，others is PTE_R and PTE_X
+
+## Code: creating an address space
+
+xv6 中主要操作地址空间和页表的代码都在 `vm.c`
+
+一个 pagetable_t 要么是内存页，或者是进程的页表。
+
+主要的函数有两个：
+
+- `walk` ， 为虚拟地址找到对应的 PTE
+- `mappages`，为新的映射安装 PTE
+
+以 `kvm` 开头的函数操作用户页表，以 `uvm` 开头的函数操作用户页表，其他函数两者都可以操作。
+
+`copyout` 和 `copyin` 用于从系统调用提供的虚拟地址，将内核的数据拷贝入或者拷贝出。
+
+这些代码之所以在 `vm.c` ，是因为他们需要显式地转换地址，以便于找到对应的物理地址（没太明白）
+
+在 Boot 靠前的部分，main 会调用 `kvminit`，使用 `kvmmake` 创造一个内核页面。这个调用发生在RISC-V开启页面之前，所以地址直接对应物理内存。`kvmmake` 会先分配一页物理页来作为页表页的根。然后它会调用 `kvmmap` 以安装内核所需要的 translations，包含了内核的指令和数据，直到 PHYSTOP 的物理内存，和实际设备的内存。
+
+`kvmmap` 会调用 `mappages`，以为一个范围的虚拟地址装载到对应范围的物理地址的映射。It does this separately for each virtual address in the range, at page intervals.
+
+对于每个虚拟地址，`mappages ` 调用 `walk` 去寻找地址对应的 PTE 的地址。然后初始化 PTE 。
+
+`walk` 模仿 RISC-V 的硬件去寻找虚拟地址的 PTE 
+
+```c
+pte_t *
+walk(pagetable_t pagetable, uint64 va, int alloc)
+{
+  if(va >= MAXVA)
+    panic("walk");
+
+  for(int level = 2; level > 0; level--) {
+    pte_t *pte = &pagetable[PX(level, va)];//获取PTE
+    if(*pte & PTE_V) { // 如果存在，就替换pagetable
+      pagetable = (pagetable_t)PTE2PA(*pte);
+    } else {
+      if(!alloc || (pagetable = (pde_t*)kalloc()) == 0) 
+        return 0;// 否则分配新的pagetable，然后装载在pagetable[PX(level, va)]（原来的）里
+      memset(pagetable, 0, PGSIZE);
+      *pte = PA2PTE(pagetable) | PTE_V;
+    }
+  }
+  return &pagetable[PX(0, va)];
+}
+```
+
+`kvminithart` 装载内核页表。它将根页表页的物理地址写入寄存器 `satp` 。在此之后CPU会用内核页表页转换地址。Since the kernel uses an identity mapping, the now virtual address of the next instruction will map to the right physical memory address.（不明白）
+
+`procinit` 为每个进程分配 kernel stack。它将每个栈映射到KSTACK生成的虚拟地址，这为无效的堆栈保护页留下了空间。
+
+RISC-V 的 CPU 在 TLB 缓存页表项。当 xv6 更换页表时，必须告诉 CPU 使得对应的缓存 TLB 项失效。
+
+RISC-V 可以用`sfence.vma`刷新当前 CPU 的 TLB。xv6 在重新装载 `stap` 寄存器以后，在 `kvminithart` 中执行 `sfence.vma`，and in the trampoline code that switches to a user page table before returning to user space.
+
+##  Physical memory allocation
+
+内核需要在运行时为 page table, user memory, kernel stack, pipe buffers 分配或者释放物理内存。
+
+xv6 使用 kernel 末端和 PHYSTOP 之间的物理内存作为运行时分配的内存。它一次会释放或者分配大小为 4096 bytes 的一页。xv6 使用一个链表维护空闲的页
+
+## Code: Physical memory allocator
+
+`kinit ` 会初始化 allocator，在这里 xv6 假设机器有 128M 的RAM。
+
+`kfree` 会将要 free 的空间用 1 填充
+
+## Process address space
+
+用户进程从虚拟地址 0 开始，最多可达 $2^{38}$，也就是 256G。
+
+进程地址空间包括：
+
+- pages that contain the text of program
+  - PTE_R, PTE_X, and PTE_U
+- pages that contain pre-initialized data of program
+  - PTE_R, PTE_W, and PTE_U
+- a page for the stack
+  - PTE_R, PTE_W, and PTE_U
+  - the initial contents as created by exec.
+  - Strings containing the command-line arguments, as well as an array of pointers to them, are at the very top of the stack
+- pages for the heap
+  - PTE_R, PTE_W, and PTE_U
+
+xv6 通过在 stack 正下方放置了一个不能访问的守护页（清除了 `PTE_U` )，而现实的操作系统会自动申请更多的内存当用户栈溢出时。
+
+当 xv6 申请更多的用户内存时，xv6 会增长它的用户栈。xv6 先使用 `kalloc` 分配物理内存，然后在进程的页表页添加指向新的物理页的 PTE 
+
+Third, the kernel maps a page with trampoline code at the top of the user address space (without PTE_U), thus a single page of physical memory shows up in all address spaces, but can be used only by the kernel.
+
+## Code: sbrk
 
 TO DO
 
-## 3.8 Code: exec
+## Code: exec
 
 TO DO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+
 
 # xv6 启动过程
 
