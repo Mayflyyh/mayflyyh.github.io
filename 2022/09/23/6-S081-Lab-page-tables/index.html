@@ -19,32 +19,29 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"mayflyyh.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="开始做6-S081的实验">
+    <meta name="description" content="继续做实验..">
 <meta property="og:type" content="article">
-<meta property="og:title" content="6.S081 Lab: Xv6 and Unix utilities">
-<meta property="og:url" content="http://mayflyyh.github.io/2022/09/11/6-S081-Lab-Xv6-and-Unix-utilities/index.html">
+<meta property="og:title" content="6.S081 Lab: page tables">
+<meta property="og:url" content="http://mayflyyh.github.io/2022/09/23/6-S081-Lab-page-tables/index.html">
 <meta property="og:site_name" content="Mayflyyh&#39;s blog">
-<meta property="og:description" content="开始做6-S081的实验">
+<meta property="og:description" content="继续做实验..">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://swtch.com/~rsc/thread/sieve.gif">
-<meta property="og:image" content="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1662954828683.png">
-<meta property="article:published_time" content="2022-09-11T22:21:44.000Z">
+<meta property="article:published_time" content="2022-09-23T00:49:32.000Z">
 <meta property="article:modified_time" content="2022-09-22T17:09:01.746Z">
 <meta property="article:author" content="Mayflyyh">
 <meta property="article:tag" content="OS">
 <meta property="article:tag" content="lab">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://swtch.com/~rsc/thread/sieve.gif">
 
 
-<link rel="canonical" href="http://mayflyyh.github.io/2022/09/11/6-S081-Lab-Xv6-and-Unix-utilities/">
+<link rel="canonical" href="http://mayflyyh.github.io/2022/09/23/6-S081-Lab-page-tables/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://mayflyyh.github.io/2022/09/11/6-S081-Lab-Xv6-and-Unix-utilities/","path":"2022/09/11/6-S081-Lab-Xv6-and-Unix-utilities/","title":"6.S081 Lab: Xv6 and Unix utilities"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://mayflyyh.github.io/2022/09/23/6-S081-Lab-page-tables/","path":"2022/09/23/6-S081-Lab-page-tables/","title":"6.S081 Lab: page tables"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>6.S081 Lab: Xv6 and Unix utilities | Mayflyyh's blog</title>
+<title>6.S081 Lab: page tables | Mayflyyh's blog</title>
   
 
 
@@ -114,7 +111,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Boot-xv6"><span class="nav-number">1.</span> <span class="nav-text">Boot xv6</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sleep-easy"><span class="nav-number">2.</span> <span class="nav-text">sleep  (easy)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pingpong-easy"><span class="nav-number">3.</span> <span class="nav-text">pingpong (easy)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#primes-moderate-x2F-hard"><span class="nav-number">4.</span> <span class="nav-text">primes (moderate)&#x2F;(hard)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#find-moderate"><span class="nav-number">5.</span> <span class="nav-text">find (moderate)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xargs-moderate"><span class="nav-number">6.</span> <span class="nav-text">xargs (moderate)</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Print-a-page-table"><span class="nav-number">1.</span> <span class="nav-text">Print a page table</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#A-kernel-page-table-per-process"><span class="nav-number">2.</span> <span class="nav-text">A kernel page table per process</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -177,7 +174,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://mayflyyh.github.io/2022/09/11/6-S081-Lab-Xv6-and-Unix-utilities/">
+    <link itemprop="mainEntityOfPage" href="http://mayflyyh.github.io/2022/09/23/6-S081-Lab-page-tables/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -190,12 +187,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="6.S081 Lab: Xv6 and Unix utilities | Mayflyyh's blog">
+      <meta itemprop="name" content="6.S081 Lab: page tables | Mayflyyh's blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          6.S081 Lab: Xv6 and Unix utilities
+          6.S081 Lab: page tables
         </h1>
 
         <div class="post-meta-container">
@@ -206,7 +203,7 @@
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2022-09-11 22:21:44" itemprop="dateCreated datePublished" datetime="2022-09-11T22:21:44+00:00">2022-09-11</time>
+      <time title="Created: 2022-09-23 00:49:32" itemprop="dateCreated datePublished" datetime="2022-09-23T00:49:32+00:00">2022-09-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -235,34 +232,22 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>开始做6-S081的实验</p>
- <span id="more"></span> 
+        <p>继续做实验..</p>
+<span id="more"></span>
 
-<p>链接：<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/util.html">点击此处</a></p>
-<h2 id="Boot-xv6"><a href="#Boot-xv6" class="headerlink" title="Boot xv6"></a>Boot xv6</h2><p>安装在了wls上</p>
-<blockquote>
-<p>You can run make grade to test your solutions with the grading program.</p>
+
+
+<h2 id="Print-a-page-table"><a href="#Print-a-page-table" class="headerlink" title="Print a page table"></a>Print a page table</h2><h2 id="A-kernel-page-table-per-process"><a href="#A-kernel-page-table-per-process" class="headerlink" title="A kernel page table per process"></a>A kernel page table per process</h2><blockquote>
+<p>xv6 有一个单独的 kernel page table，并且它是直接映射到物理地址中的。</p>
+<p>xv6 还为每个进程的 user address space 维护了单独的页表，只包含进程的 user memory 的映射。因为 kernel page table 不包含这些映射，user address 在 kernel 中是无效的。所以当 kernel 想要使用 system call 传递的 user pointer 时，kernel 首先要将这个指针转换成物理地址。</p>
+<p>本节和下节的目标是允许 kernel 直接使用 user pointer</p>
 </blockquote>
-<h2 id="sleep-easy"><a href="#sleep-easy" class="headerlink" title="sleep  (easy)"></a>sleep  (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">easy</a>)</h2><blockquote>
-<p>Implement the UNIX program <code>sleep</code> for xv6; your <code>sleep</code> should pause for a user-specified number of ticks. A tick is a notion of time defined by the xv6 kernel, namely the time between two interrupts from the timer chip. Your solution should be in the file <code>user/sleep.c</code>.</p>
-</blockquote>
-<p>直接 Use the system call sleep 即可</p>
-<h2 id="pingpong-easy"><a href="#pingpong-easy" class="headerlink" title="pingpong (easy)"></a>pingpong (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">easy</a>)</h2><blockquote>
-<p>Write a program that uses UNIX system calls to ‘’ping-pong’’ a byte between two processes over a pair of pipes, one for each direction. The parent should send a byte to the child; the child should print “<pid>: received ping”, where <pid> is its process ID, write the byte on the pipe to the parent, and exit; the parent should read the byte from the child, print “<pid>: received pong”, and exit. Your solution should be in the file <code>user/pingpong.c</code>.</pid></pid></pid></p>
-</blockquote>
-<p>很简单</p>
-<h2 id="primes-moderate-x2F-hard"><a href="#primes-moderate-x2F-hard" class="headerlink" title="primes (moderate)&#x2F;(hard)"></a>primes (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">moderate</a>)&#x2F;(<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">hard</a>)</h2><blockquote>
-<p>Write a concurrent version of prime sieve using pipes. This idea is due to Doug McIlroy, inventor of Unix pipes. The picture halfway down <a target="_blank" rel="noopener" href="http://swtch.com/~rsc/thread/">this page</a> and the surrounding text explain how to do it. Your solution should be in the file <code>user/primes.c</code>.</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="http://swtch.com/~rsc/thread/">this page</a> 很有意思</p>
-<p> <img src="https://swtch.com/~rsc/thread/sieve.gif" alt="img"> </p>
-<p>利用递归思想和<code>fork()</code>和<code>pipe()</code>进行实现</p>
-<h2 id="find-moderate"><a href="#find-moderate" class="headerlink" title="find (moderate)"></a>find (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">moderate</a>)</h2><blockquote>
-<p>Write a simple version of the UNIX find program: find all the files in a directory tree with a specific name. Your solution should be in the file <code>user/find.c</code>. </p>
-</blockquote>
-<p>魔改 <code>ls.c</code></p>
-<h2 id="xargs-moderate"><a href="#xargs-moderate" class="headerlink" title="xargs (moderate)"></a>xargs (<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/labs/guidance.html">moderate</a>)</h2><p>利用 <code>|</code> 传输的数据直接用read读就好</p>
-<p><img src="https://raw.githubusercontent.com/Mayflyyh/picrepo/main/1662954828683.png" alt="1662954828683"></p>
+<p>本节任务是需要修改 kernel ，所以每个进程在 kernel 执行时 会使用这个进程自己的 kernel 的拷贝。</p>
+<ol>
+<li>修改 <code>struct proc</code>，为每个进程维护一个 <code>kernel page</code></li>
+<li>修改 <code>scheduler</code> 使得在切换进程时可以切换 kernel page</li>
+</ol>
+<p>所以  each per-process kernel page table should be identical to the existing global kernel page table</p>
 
     </div>
 
@@ -280,14 +265,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2022/09/10/CS144-Lab2-TCP-receiver/" rel="prev" title="CS144 Lab2 TCP receiver">
-                  <i class="fa fa-chevron-left"></i> CS144 Lab2 TCP receiver
+                <a href="/2022/09/21/CS144-Lab3-TCP-sender/" rel="prev" title="CS144 Lab3 TCP sender">
+                  <i class="fa fa-chevron-left"></i> CS144 Lab3 TCP sender
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2022/09/13/6-S081-Lab-System-call-tracing/" rel="next" title="6.S081 Lab: System call tracing">
-                  6.S081 Lab: System call tracing <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
