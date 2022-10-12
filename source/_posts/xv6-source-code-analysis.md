@@ -247,7 +247,29 @@ TO DO
 
 # Page Table
 
-TO DO
+##  Paging hardware
+
+RISCV kernel 和 user 指令都在虚拟地址操作，RISCV 通过页表硬件以将虚拟地址映射到物理地址。
+
+xv6 runs on Sv39 RISC-V, which means that only the bottom 39 bits of a 64-bit virtual address are used; the top 25 bits are not used.
+
+在 Sv39 的配置中，一个 pagetabe 包含了 $2^{27}=134217728$ 个 PTES。每个 PTE 包含了一个 44bit 的 physical page number (PPN) 和一些 flags。页表硬件通过 39 位的高 27 位找寻 PTE。 并且通过 PTE 中的 PPN (44bit) 加上 虚拟地址的低 12 位作为一个 56 位的物理地址。
+
+实际上采用了 3 级树形 page table ，以不需要存储没有实际用到的 PTE
+
+`PTE_V` 表示该 PTE 是否存在
+
+`PTE_R` 表示是否允许指令读这个 page
+
+`PTE_W` 表示是否允许指令写这个 page
+
+`PTE_X` 表示是否允许 CPU 解释这个 page 的内容并且执行他们。
+
+`PTE_U` 表示是否允许 `supervisor mode` 以外的模式读取这个 page（权限控制）
+
+为了让硬件可以使用页表，kernel 必须将 root page-table page 的物理地址写入 `satp` 寄存器。每个 CPU 拥有自己的 `satp` 寄存器，CPU 将通过 `stap` 指向的 page 把接下来指令生成的地址进行翻译。每个 CPU 拥有自己的 `satp` 寄存器，所以每个 CPU 可以执行不同进程。
+
+指令只会使用虚拟地址，每个虚拟地址由 page hardware 翻译成物理地址然后发送到 DRAM 硬件以读写。
 
 ## Kernel address space
 
@@ -373,11 +395,23 @@ Third, the kernel maps a page with trampoline code at the top of the user addres
 
 ## Code: sbrk
 
-TO DO
+`sbrk` 是 process 用来缩小或增长 memory 的系统调用。由 `growproc` 实现，`growproc` 调用 `uvmalloc` 和 `uvmdealloc`。
+
+`uvmalloc` 通过 `kalloc` 分配物理内存，使用 `mappages` 向 user page table 中添加 PTES。
+
+`vmdealloc` 调用 `uvmunmap`，以使用 `walk`  找寻 PTEs 并且释放与其有关的物理内存。
+
+xv6 进程的 page table 不止告诉硬件如何映射虚拟地址，也作为分配给进程的物理内存页的唯一记录。这也是 user memory 需要遍历用户 page table的原因。
 
 ## Code: exec
 
-TO DO
+`exec` 从文件系统中的文件初始化 the user part of an address space 。 `exec` 使用 `namei` 打开指定的二进制路径 `path`。然后他会读 `ELF header`。xv6 应用程序使用 ELF-format 描述，定义在 `kernel/elf.h`。
+
+ELF 二进制文件由 `ELF header`，`struct elfhdr` 和 `struct proghdr` 构成。
+
+每一个 `proghdr` 描述了应用程序必须载入内存的一段。xv6 程序只有一个 program section header ，但是其他系统可能有分别的指令与数据。
+
+第一步，快速检查文件是否可能包含ELF二进制文件。一个 ELF 二进制文件起始于 四个字节的 `magic number`，0x7F , E , L , F , 或者是 `0x464C457FU` ("\x7FELF" in little endian) 。如果 ELF 头有正确`magic number`，`exec` 会认为它是正确的 ELF 文件
 
 
 
@@ -430,6 +464,175 @@ TO DO
 
 
 ---
+
+
+
+# Traps and system calls
+
+## Calling Convention
+
+long double 128-bit
+
+C types `char` and `unsigned char` are zero-extended when stored in a RISC-V integer register.
+
+All `unsigned` are zero-extended, otherwise are sign-extended.
+
+RV64 的C编译器和兼容软件都保持对数据类型的内存对齐。
+
+`a0-a7` integer registers，`fa0-fa7` floating-point registers
+
+When primitive arguments twice the size of a pointer-word are passed on the stack, they are naturally aligned. When they are passed in the integer registers, they reside in an aligned even-odd register pair, with the even register holding the least-significant bits.
+
+当两倍于指针字大小的参数传入寄存器时，他们会利用一对偶奇寄存器，偶寄存器存储 least-significant bits.
+
+`void foo(int, long long)` is passed its first argument in a0 and its second in a2 and a3. Nothing is passed in a1.
+
+## Start
+
+有三种使得 CPU 跳出普通指令的执行，强制跳转到一段特别的代码去执行事项。
+
+第一种情况是 `system call` ，用户程序调用 `ecall` 使得内核为它做一些事。
+
+第二种情况是 `exception`，当指令做了一些不合法的事情时。
+
+第三种情况是 `device interrupt`，当一个设备触发了提示它需要被注意。
+
+本书用 `trap` 代指以上情况。`trap` 对指令应该是透明的。值得注意的是中断代码不期望被中断。
+
+`trap` 强制将控制权转入内核的过程通常是这样的：
+
+1. kernel 保存需要恢复的寄存器和执行的其他状态
+2. kernel 执行正确的 `handler code`
+3. kernel 恢复保存的寄存器和状态，从 `trap` 恢复。
+
+xv6 trap handling 分为四个阶段：
+
+1. hardware actions taken by the RISC-V CPU
+2. an assembly “vector” that prepares the way for kernel C code
+3. a C trap handler that decides what to do with the trap
+4. the system call or device-driver service routine. 
+
+尽管可以用一个代码路径处理三个不同类型的 trap，但是事实证明对于：
+
+1. traps from user space
+2. traps from kernel space
+3. time interrupts
+
+这三种情况分别准备 assembly vectors and C trap handlers 更好。
+
+## RISC-V trap machinery
+
+每一个 RISC-V CPU 都有一组控制寄存器，kernel 通过写这些寄存器告诉 CPU 怎么处理这些 trap，kernel 也可以读寄存器来发现已经发生的 trap。可以在 `riscv.h` 中看见更多寄存器。
+
+An outline of the most important registers:
+
+- `stvec`：内核将 trap handler 的地址写在这里。RISC-V 跳转到这里处理 trap
+
+- `sepc`：当 trap 发生时，RISC-V 将 PC 保存在这里。（因为 `pc` 会被 `stvec` 重写）。`sret` (return from trap) 会将 `sepc` 考入到 `pc` 。The kernel can write to `sepc` to control where `sret` goes.
+
+- `scause`：RISC-V 将 trap 的原因写入在此。
+
+- `sscratch`：The kernel places a value here that comes in handy at the very start of a trap handler.
+
+- `sstatus`：
+
+  - The `SIE` bit in `sstatus` controls whether device interrupts are enabled. If the kernel clears `SIE`, the RISC-V will defer device interrupts until the kernel sets `SIE`. 
+  - The `SPP` bit indicates whether a trap came from user mode or supervisor mode, and controls to what mode `sret` returns.
+
+  The above registers relate to traps handled in supervisor mode, and they cannot be read or written in user mode.
+
+  在 machine mode 下有一组等效的寄存器组，xv6 只使用它们用于处理时钟中断。
+
+  当需要执行 trap 时，RISC-V 会对所有类型执行以下步骤（除了时钟中断）：
+
+  1. 如果 trap 是 device interrupt 并且 `sstatus` 的 `SIE` 位被清除了，不执行以下过程。
+  2. 清除 `SIE` 以关闭中断
+  3. 将 `pc` 拷贝到 `sepc`
+  4. 设置 `sstatus` 中的 `SPP` 位以保存当前的状态 (user or supervisor)
+  5. 设置 `scause` 以反映 trap 的原因
+  6. 将状态设置为 `supervisor`
+  7. 将 `stvec` 拷贝到 `pc`
+  8. 开始从新 `pc` 执行
+
+注意 CPU 不会切换到内核页表，不会切换到内核栈，除了 `pc` 以外不会保存任何寄存器。Kernel 必须完成这些任务。
+
+（CPU只会做最小的工作以提供灵活性和性能）
+
+## Traps from user space
+
+来自用户空间的高级别的 trap 路线是通过 `userrvec`，`usertrap`，返回时是 `usertrapret` 和 `uesrret`。
+
+从用户代码 trap 比从内核更复杂，因为指向用户页表的`satp`并不映射内核，且指针可能包含不合法甚至于有害的值。
+
+因为 RISC-V 硬件不在 trap 时切换页表，所以用户页表必须包含对 `userrvec` 的映射和 `stvec` 所指向的 trap vector  instruction. `userrvec` 必须切换 `stap` 以指向内核页表。为了在切换后继续执行指令，`userrvec` 必须在内核页表和用户页表的相同地址映射。
+
+xv6 通过在 `trampoline` 包含 `userrvec` 以满足这些限制。xv6 映射 `trampoline` 在用户页表和内核页表的相同虚拟地址（这个虚拟地址是`TRAMPOLINE`）。`trampoline`的内容被设置在`trampoline.S`。在执行用户代码时，`stvec` 被设置为 `userrvec`。
+
+`userrvec` 开始后，32个寄存器会被中断代码占用。但是 `userrvec` 需要修改一些寄存器，以设置 `satp` 并且生成保存寄存器的地址。`csrrw` 指令 在 `userrvec` 开始时交换`a0`和 `sscratch` 寄存器的内容。现在 `userrvec` 可以使用 `a0` 寄存器。
+
+ `userrvec` 下一步需要保存用户寄存器。在进入用户空间前，内核设置`sscratch` 指向每个进程的`trapframe`（保存所有用户寄存器的空间）。因为 `satp` 仍引用用户页表，`userrvec` 需要 `trapframe` 被映射在用户空间。当创建新进程时，xv6 会为进程的 `trapframe` 分配一页，并将它映射到虚拟地址的 `TRAPFRAME` 处，且总是在 `TRAMPOLINE` 下面。进程的 `p->trapframe` 总是指向 trapframe，因为是它的物理地址，所以内核可以通过内核页表访问它。
+
+在交换了 `a0` 和 `sscratch` 之后，`a0` 持有一个指向当前进程 trapframe 的指针。`userrvec` 现在保存所有寄存器在此处，包括从 `sscratch `读取的用户的 `a0`。
+
+`trapframe` 保存指向当前进程的内核栈的指针，当前CPU的hartid，和 `usertrap` 的地址和内核页表的地址。`userrvec` 检索这些值，将 `satp` 切换到内核页表，并调用 `usertrap`.
+
+`usertrap` 的工作是确定 trap 的原因，处理它然后返回 (在 `trap.c`) 。它先改变 `stvec`，使得内核中的 trap 可以被 `kernelvec` 处理。它需要保存 `sepc` ，因为 `usertrap` 中可能出现进程切换导致 `spec` 被覆盖。
+
+如果 trap 是一个系统调用，那么 `syscall` 会处理它。
+
+如果 trap 是一个设备终端，那么 `devintr` 会处理它。
+
+否则 trap 是一个异常，内核会杀死出错的进程。 
+
+系统调用会为保存的用户 `pc` 上加4，以使得 pc 指针指向 `ecall` 指令。在退出时，`usertrap` 会检查进程是否已被杀死，或者在 `trap` 是时钟中断时释放 CPU。
+
+返回用户空间的第一步是调用 `usertrapret` 。这个函数设置 RISCV 控制寄存器以为来自用户空间的未来的 trap 做准备。这包括更改 `stvec` 以引用 `uservec`，准备 `uservec` 所依赖的 trapframe fields，将 `sepc` 设置为之前保存的 `pc`。结束时，`usertrapret` 调用 映射到用户和内核空间的 trampoline page 上的 `userret` ，`userret` 中的汇编代码将切换页表。
+
+`usertrapret` 对 `userret` 的调用传递了一个指向 `a0` 中的用户页表和 `a1` 中的 `TRAPFRAME` 的指针. `userret` 切换 `satp` 至用户页表。用户页表映射了 trampoline page 和 `TRAPFRAME` ，但不映射来自内核的其他页面。 trampoline page 在用户页表和内核页表映射在相同虚拟地址，所以 `uservec` 可以在改变 `satp` 后继续执行。
+
+`userret` 将 trapframe 保存的用户`a0`拷贝到`sscratch`，以准备与`TRAPFRAME`交换。
+
+## Code: Calling system calls
+
+用户代码将exec的参数放在寄存器`a0`和`a1`，并将系统调用号码放在`a7`。系统调用编号匹配`syscalls`数组中的入口（一个函数指针表）。`ecall` trap 进内核然后执行 `uservec`，`usertrap`，`syscall`.
+
+`syscall` 从`a7`检索系统调用编号，并将其当作`syscalls`的下标。
+
+当系统调用返回时，`syscall` 在`p->trapframe->a0`记录返回值，
+
+## Code: System call arguments
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
